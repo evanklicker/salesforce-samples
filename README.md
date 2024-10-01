@@ -1,0 +1,1 @@
+This repo just has some code samples dredged up from my past experience and made generic and potentially useful. More than anything else, this is just for my own practice.
