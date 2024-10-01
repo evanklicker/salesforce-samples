@@ -1,18 +1,13 @@
-# Salesforce DX Project: Next Steps
+# Enhanced Functionality
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+I'm trying to stuff as much functionality into this component as possible. Right now, the following capabilities are planned to be implemented (in no particular order):
+- Sorting rows
+- Paging
+- Searching
+- Filtering
+- Selecting rows
+- Row actions
+- Inline editing
+- Customize which columns display and in what order
 
-## How Do You Plan to Deploy Your Changes?
-
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
-
-## Configure Your Salesforce DX Project
-
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
-
-## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+If I complete all the above, the I may spend some time increasing the volume of records able that can be handled by this component. With just the above specifications all done client-side, it probably wouldn't be able to effectively handle more than 2,000 records (the limit of the number of records returned by a single soql query). Some simple server-side handling could raise that up to 200,000 (100 queries * 2000 records per query), but by being smart we could raise that quite a bit more.

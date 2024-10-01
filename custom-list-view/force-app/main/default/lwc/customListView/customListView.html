@@ -1,0 +1,48 @@
+<template>
+    <div>
+        <lightning-card>
+            <div style="height: 300px">
+                <lightning-datatable
+                        key-field="id"
+                        data={displayedData}
+                        show-row-number-column
+                        draft-values={draftValues}
+                        columns={columns}>
+                </lightning-datatable>
+            </div>
+            <p slot="footer"> 
+                <lightning-button-icon 
+                    icon-name="utility:jump_to_left" 
+                    onclick={handleFirstPageButtonClicked} 
+                    alternative-text="First page" 
+                    title="First page"
+                    disabled={pageLeftDisabled}>
+                </lightning-button-icon>
+                <lightning-button-icon 
+                    icon-name="utility:chevronleft" 
+                    onclick={handlePreviousPageButtonClicked} 
+                    alternative-text="Page left" 
+                    title="Page left" 
+                    disabled={pageLeftDisabled}
+                    class="slds-m-left_xx-small">
+                </lightning-button-icon>
+                <lightning-button-icon 
+                    icon-name="utility:chevronright" 
+                    onclick={handleNextPageButtonClicked} 
+                    alternative-text="Page right" 
+                    title="Page right" 
+                    disabled={pageRightDisabled}
+                    class="slds-m-left_xx-small">
+                </lightning-button-icon>
+                <lightning-button-icon 
+                    icon-name="utility:jump_to_right" 
+                    onclick={handleLastPageButtonClicked} 
+                    alternative-text="Last page" 
+                    title="Last page" 
+                    disabled={pageRightDisabled}
+                    class="slds-m-left_xx-small">
+                </lightning-button-icon>
+            </p>
+        </lightning-card>
+    </div>
+</template>
