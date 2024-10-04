@@ -4,6 +4,9 @@ import { TableData } from './customListViewHelper';
 
 const columns = [
     { label: 'Label', fieldName: 'name', editable: true },
+    { label: 'Name', fieldName: 'url', type: 'url', typeAttributes: {
+        label: { fieldName: 'name'}
+    }},
     { label: 'Website', fieldName: 'website', type: 'url', editable: true },
     { label: 'Phone', fieldName: 'phone', type: 'phone', editable: true },
     { label: 'CloseAt', fieldName: 'closeAt', type: 'date', editable: true },
@@ -20,7 +23,6 @@ export default class DatatableWithInlineEdit extends LightningElement {
     draftValues = [];
     pageSize = 20;
     pages;
-    displayedData = [];
     currentPage = 1;
     isLoading = true;
     selectedRows = new Set();
@@ -28,30 +30,31 @@ export default class DatatableWithInlineEdit extends LightningElement {
     tableData = new TableData();
 
     get pageLeftDisabled() {
-        return this.tableData.currentPage === 1;
+        return this.currentPage === 1;
     }
     get pageRightDisabled() {
-        return this.tableData.currentPage === this.pages;
+        return this.currentPage === this.tableData.pages;
     }
     get pageText() {
-        return `Page ${this.tableData.currentPage} of ${this.tableData.pages}`;
+        return `Page ${this.currentPage} of ${this.tableData.pages}`;
     }
     get displayedSelectedRows() {
-        return [...displayedSelectedRowSet];
+        return [...this.displayedSelectedRowSet];
     }
-
+    get displayedData() {
+        if (!this.tableData) { return []; }
+        return [...this.tableData.getPageData(this.currentPage)];
+    }
     connectedCallback() {
         this.data = generateData({ amountOfRecords: 302 });
         if (!this.data || this.data.length === 0) { return; } // probably want to display an error in this case
         this.datatableTitle = `Accounts (${this.data.length})`;
         this.tableData = this.buildTableData({data: this.data});
-        this.displayedData = this.tableData.buildPage();
         this.pages = this.tableData.pages;
         this.isLoading = false;
     }
 
     buildTableData({data, pageSize, currentPage, filters, searchCriteria, sortOrder, sortField}) {
-        console.log(data.length);
         return new TableData(data, pageSize || this.tableData.pageSize, currentPage || this.tableData.currentPage, filters, searchCriteria, sortOrder, sortField);
     }
     
@@ -85,27 +88,27 @@ export default class DatatableWithInlineEdit extends LightningElement {
     }
 
     handleFirstPageButtonClicked = () => {
-        if (this.tableData.currentPage > 1) {
-            this.tableData = this.buildTableData({data: this.data, currentPage: 1});
-            this.displayedData = this.tableData.buildPage();
+        if (this.currentPage > 1) {
+            this.currentPage = 1;
+            // this.tableData = this.buildTableData({data: this.data, currentPage: 1});
         }
     }
     handlePreviousPageButtonClicked = () => {
-        if (this.tableData.currentPage > 1) {
-            this.tableData = this.buildTableData({data: this.data, currentPage: this.tableData.currentPage-1});
-            this.displayedData = this.tableData.buildPage();
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            // this.tableData = this.buildTableData({data: this.data});
         }
     }
     handleNextPageButtonClicked = () => {
-        if (this.tableData.currentPage < this.tableData.pages) {
-            this.tableData = this.buildTableData({data: this.data, currentPage: this.tableData.currentPage+1});
-            this.displayedData = this.tableData.buildPage();
+        if (this.currentPage < this.tableData.pages) {
+            this.currentPage++;
+            // this.tableData = this.buildTableData({data: this.data});
         }
     }
     handleLastPageButtonClicked = () => {
-        if (this.tableData.currentPage < this.tableData.pages) {
-            this.tableData = this.buildTableData({data: this.data, currentPage: this.tableData.pages});
-            this.displayedData = this.tableData.buildPage();
+        if (this.currentPage < this.tableData.pages) {
+            this.currentPage = this.tableData.pages;
+            // this.tableData = this.buildTableData({data: this.data});
         }
     }
 

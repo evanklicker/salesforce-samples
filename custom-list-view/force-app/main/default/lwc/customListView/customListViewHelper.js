@@ -8,25 +8,29 @@ export class TableData {
 
     data;
     pageSize;
-    currentPage;
     pages;
     filters;
     searchCriterion;
     sortOrder;
     sortField;
     
-    displayedData;
+    pagedData = [];
 
     // Is any selected row stuff gonna live here?
-    constructor(data=[], pageSize=100, currentPage=1, filters=[], searchCriteria='', sortOrder='asc', sortField='Id') {
+    constructor(data=[], pageSize=100, filters=[], searchCriteria='', sortOrder='asc', sortField='Id') {
         this.data = data;
         this.pageSize = pageSize;
-        this.currentPage = currentPage;
         // maybe something like this? Filter: {field: 'string', operator: 'string', filterValue: 'string' }
         this.filters = filters;
         this.searchCriteria = searchCriteria;
         this.sortOrder = sortOrder;
         this.sortField = sortField;
+        this.buildPage();
+    }
+
+    getPageData(page) {
+        if (!(page > 0 && page <= this.pagedData.length)) { return []; }
+        return this.pagedData[page-1];
     }
 
     // Probably will end up returning an object with all the necessary params (pages, searchHighlighting? displayedData. maybe more?) to keep this functional
@@ -35,9 +39,7 @@ export class TableData {
         let data = this.applyFilters(this.data, this.filters);
         data = this.applySearchCriterion(data, this.searchCriterion);
         data = this.sort(data, this.sortOrder, this.sortField);
-        ({ pages: this.pages, displayedData: data } = this.applyPaging(data, this.pageSize, this.currentPage));
-        this.displayedData = data;
-        return data;
+        ({ pages: this.pages, pagedData: this.pagedData } = this.applyPaging(data, this.pageSize));
     }
 
     applyFilters(data, filters) {
@@ -75,11 +77,14 @@ export class TableData {
         return data;
     }
 
-    applyPaging(data, pageSize, currentPage) {
-        return {
-            pages: Math.ceil(data.length / pageSize),
-            displayedData: data.slice(Math.max((currentPage-1) * pageSize, 0), Math.min(currentPage * (pageSize), data.length))
+    applyPaging(data, pageSize) {
+        let pages = Math.ceil(data.length / pageSize);
+        let pagedData = [];
+        // Split up the data in pages
+        for (let i = 0; i < pages; i++) {
+            pagedData.push(data.slice(Math.max(i * pageSize, 0), Math.min((i+1) * pageSize, data.length)));
         }
+        return { pages, pagedData }
     }
 
 }
