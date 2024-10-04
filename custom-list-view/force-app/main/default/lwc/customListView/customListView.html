@@ -1,6 +1,7 @@
 <template>
     <div>
         <lightning-card title={datatableTitle}>
+            <lightning-formatted-text class="slds-p-left_medium" value={selectedRowsText}></lightning-formatted-text>
             <div style="height: 300px">
                 <lightning-datatable
                         key-field="id"
