@@ -28,6 +28,11 @@ export default class DatatableWithInlineEdit extends LightningElement {
     selectedRows = new Set();
     tableData = new TableData();
 
+    searchTimeout;
+    searchTerm;
+    // can be tuned to user preferences. Power users may want this lower, but I probably wouldn't go lower than 1 sec or higher than 2 sec
+    SEARCH_TIMEOUT_DURATION = 1000;
+
     get pageLeftDisabled() {
         return this.currentPage === 1;
     }
@@ -52,7 +57,7 @@ export default class DatatableWithInlineEdit extends LightningElement {
         return `${this.selectedRows.size} items selected`;
     }
     connectedCallback() {
-        this.data = generateData({ amountOfRecords: 302 });
+        this.data = generateData({ amountOfRecords: 305 });
         if (!this.data || this.data.length === 0) { return; } // probably want to display an error in this case
         this.datatableTitle = `Accounts (${this.data.length})`;
         this.tableData = this.buildTableData({data: this.data, pageSize: this.pageSize});
@@ -60,13 +65,27 @@ export default class DatatableWithInlineEdit extends LightningElement {
         this.isLoading = false;
     }
 
-    buildTableData({data, pageSize, currentPage, filters, searchCriteria, sortOrder, sortField}) {
-        return new TableData(data, pageSize || this.tableData.pageSize, currentPage || this.tableData.currentPage, filters, searchCriteria, sortOrder, sortField);
+    buildTableData({data, pageSize, filters, searchCriterion, sortOrder, sortField}) {
+        return new TableData(data || this.data, pageSize || this.tableData.pageSize, filters, searchCriterion || this.searchTerm, sortOrder, sortField);
     }
-    fixRowSelection() {
-        let displayedData = new Set(this.displayedData.map(row => row.id));      
-        this.displayedSelectedRows = [...displayedData.intersection(this.selectedRows)];
+
+    // When the user types into the box, wait for 2 seconds before running the search to give them an opportunity to finish typing before removing their control
+    handleSearchTermChanged(event) {
+        if (this.searchTimeout) { window.clearTimeout(this.searchTimeout); }
+        this.searchTimeout = window.setTimeout(() => {
+            try {
+                this.searchTerm = event.detail.value;
+                this.tableData = this.buildTableData({searchCriterion: this.searchTerm});
+                this.handleFirstPageButtonClicked();
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.isLoading = false;
+            }
+        }, this.SEARCH_TIMEOUT_DURATION);
+        this.isLoading = true;
     }
+
     handleRowSelection(event) {
         switch (event.detail.config.action) {
             case 'selectAllRows':

@@ -2,10 +2,14 @@
     <div>
         <lightning-card title={datatableTitle}>
             <lightning-formatted-text class="slds-p-left_medium" value={selectedRowsText}></lightning-formatted-text>
-            <div style="height: 300px">
+            <lightning-input class="slds-p-around_small" label="" placeholder="Search records..." type="search" onchange={handleSearchTermChanged}></lightning-input>
+            <!-- I'd really like this spinner to just cover the datatable but it's just not working... -->
+            <div class="spinnerContainer" style="height: 300px">        
+                <div if:true={isLoading}>
+                    <lightning-spinner class="spinnerClass" alternative-text="Loading..."></lightning-spinner>
+                </div>
                 <lightning-datatable
                         key-field="id"
-                        is-loading={isLoading}
                         data={displayedData}
                         onrowselection={handleRowSelection}
                         selected-rows={displayedSelectedRows}

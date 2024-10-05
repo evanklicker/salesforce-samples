@@ -1,0 +1,11 @@
+.THIS .spinnerContainer {
+	position:relative;
+	height:280px;
+	border:1px solid #666;
+	overflow:auto;
+	background-color:#eee
+}
+ 
+.THIS .spinnerClass {
+	position:absolute;
+}

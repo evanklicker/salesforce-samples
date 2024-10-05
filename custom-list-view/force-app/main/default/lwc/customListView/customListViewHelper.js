@@ -17,12 +17,12 @@ export class TableData {
     pagedData = [];
 
     // Is any selected row stuff gonna live here?
-    constructor(data=[], pageSize=100, filters=[], searchCriteria='', sortOrder='asc', sortField='Id') {
+    constructor(data=[], pageSize=100, filters=[], searchCriterion='', sortOrder='asc', sortField='Id') {
         this.data = data;
         this.pageSize = pageSize;
         // maybe something like this? Filter: {field: 'string', operator: 'string', filterValue: 'string' }
         this.filters = filters;
-        this.searchCriteria = searchCriteria;
+        this.searchCriterion = searchCriterion;
         this.sortOrder = sortOrder;
         this.sortField = sortField;
         this.buildPage();
@@ -52,13 +52,18 @@ export class TableData {
         return data;
     }
 
+    // It's possible to add search highlighting to this. It's something I'd really like to do, but 
+    // I think that in order to do it, I'll need to extend base datatable and make a custom type for every
+    // data type originally supported. These custom types would then allow limited html injection
     applySearchCriterion(data, searchCriterion) {
+        if (!searchCriterion) { return data; }
+        searchCriterion = searchCriterion.toLowerCase();
         // This _might_ work for basic string searching? But I'd like to implement a fuzzy search with highlighting
         // In that case, probably will return an obj rather than the list of data
-        // let dataStrings = data.map(row => {JSON.stringify(row)});
-        // dataStrings.filter(string => string.includes(searchCriterion));
-        // return JSON.parse(dataStrings);
-        return data;
+        // there's all sorts of special cases I'd want to add here to make searching easier. Like, true = check, or true = yes, or 4 = four, 5 = five, etc
+        return data.filter(row => {
+            return JSON.stringify(row).toLowerCase().includes(searchCriterion);
+        });
     }
 
     sort(data, sortOrder, sortField) {
