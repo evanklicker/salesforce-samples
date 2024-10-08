@@ -1,6 +1,10 @@
-import { api, LightningElement, track } from 'lwc';
+import { wire, LightningElement } from 'lwc';
 import generateData from './generateData';
 import { TableData } from './customListViewHelper';
+import getColumns from '@salesforce/apex/CustomListViewController.getColumns';
+import getRecords from '@salesforce/apex/CustomListViewController.getRecords';
+import getUserData from '@salesforce/apex/CustomListViewController.getUserData';
+import saveUserData from '@salesforce/apex/CustomListViewController.saveUserData';
 
 const columns = [
     { label: 'Label', fieldName: 'name', editable: true },
@@ -63,6 +67,34 @@ export default class DatatableWithInlineEdit extends LightningElement {
         this.tableData = this.buildTableData({data: this.data, pageSize: this.pageSize});
         this.pages = this.tableData.pages;
         this.isLoading = false;
+    }
+
+    @wire(getColumns) 
+    handleGetColumns({data, error}) {
+        if (error) { 
+            this.error = error;
+        } else if (data) {
+            this.columns = data;
+            this.error = null;
+        }
+    }
+    @wire(getRecords) 
+    handleGetRecords({data, error}) {
+        if (error) { 
+            this.error = error;
+        } else if (data) {
+            this.data = data;
+            this.error = null;
+        }
+    }
+    @wire(getUserData) 
+    handleGetUserData({data, error}) {
+        if (error) { 
+            this.error = error;
+        } else if (data) {
+            this.userData = data;
+            this.error = null;
+        }
     }
 
     buildTableData({data, pageSize, filters, searchCriterion, sortOrder, sortField}) {
