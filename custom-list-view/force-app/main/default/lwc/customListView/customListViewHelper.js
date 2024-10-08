@@ -23,6 +23,7 @@ export class TableData {
         // maybe something like this? Filter: {field: 'string', operator: 'string', filterValue: 'string' }
         this.filters = filters;
         this.searchCriterion = searchCriterion;
+        console.log(searchCriterion);
         this.sortOrder = sortOrder;
         this.sortField = sortField;
         this.buildPage();
