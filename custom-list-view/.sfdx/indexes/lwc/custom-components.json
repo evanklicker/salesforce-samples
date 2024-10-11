@@ -1,1 +1,483 @@
-[]
+[
+    {
+        "_allAttributes": null,
+        "_properties": null,
+        "_methods": null,
+        "file": "c:/Users/Evank/Git/salesforce/salesforce-samples/custom-list-view/force-app/main/default/lwc/customListView/customListView.js",
+        "metadata": {
+            "decorators": [
+                {
+                    "type": "wire",
+                    "targets": [
+                        {
+                            "type": "method",
+                            "name": "handleGetColumns",
+                            "static": {},
+                            "params": {},
+                            "adapter": {
+                                "name": "getColumns",
+                                "reference": "@salesforce/apex/CustomListViewController.getColumns"
+                            }
+                        },
+                        {
+                            "type": "method",
+                            "name": "handleGetRecords",
+                            "static": {},
+                            "params": {},
+                            "adapter": {
+                                "name": "getRecords",
+                                "reference": "@salesforce/apex/CustomListViewController.getRecords"
+                            }
+                        },
+                        {
+                            "type": "method",
+                            "name": "handleGetUserData",
+                            "static": {},
+                            "params": {},
+                            "adapter": {
+                                "name": "getUserData",
+                                "reference": "@salesforce/apex/CustomListViewController.getUserData"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "classMembers": [
+                {
+                    "name": "columns",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 26,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 26,
+                            "column": 22
+                        }
+                    }
+                },
+                {
+                    "name": "draftValues",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 27,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 27,
+                            "column": 21
+                        }
+                    }
+                },
+                {
+                    "name": "pageSize",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 28,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 28,
+                            "column": 18
+                        }
+                    }
+                },
+                {
+                    "name": "pages",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 29,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 29,
+                            "column": 10
+                        }
+                    }
+                },
+                {
+                    "name": "currentPage",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 30,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 30,
+                            "column": 20
+                        }
+                    }
+                },
+                {
+                    "name": "isLoading",
+                    "type": "property",
+                    "value": {
+                        "type": "boolean",
+                        "value": true
+                    },
+                    "loc": {
+                        "start": {
+                            "line": 31,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 31,
+                            "column": 21
+                        }
+                    }
+                },
+                {
+                    "name": "selectedRows",
+                    "type": "property",
+                    "value": {
+                        "type": "unresolved"
+                    },
+                    "loc": {
+                        "start": {
+                            "line": 32,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 32,
+                            "column": 29
+                        }
+                    }
+                },
+                {
+                    "name": "tableData",
+                    "type": "property",
+                    "value": {
+                        "type": "unresolved"
+                    },
+                    "loc": {
+                        "start": {
+                            "line": 33,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 33,
+                            "column": 32
+                        }
+                    }
+                },
+                {
+                    "name": "searchTimeout",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 35,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 35,
+                            "column": 18
+                        }
+                    }
+                },
+                {
+                    "name": "searchTerm",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 36,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 36,
+                            "column": 15
+                        }
+                    }
+                },
+                {
+                    "name": "SEARCH_TIMEOUT_DURATION",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 38,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 38,
+                            "column": 35
+                        }
+                    }
+                },
+                {
+                    "name": "pageLeftDisabled",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 40,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 42,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "pageRightDisabled",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 43,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 45,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "pageText",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 46,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 48,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "displayedData",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 49,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 52,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "displayedSelectedRows",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 53,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 56,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "selectedRowsText",
+                    "type": "property",
+                    "loc": {
+                        "start": {
+                            "line": 57,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 62,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "connectedCallback",
+                    "type": "method",
+                    "loc": {
+                        "start": {
+                            "line": 63,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 70,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handleGetColumns",
+                    "type": "method",
+                    "decorator": "wire",
+                    "loc": {
+                        "start": {
+                            "line": 72,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 80,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handleGetRecords",
+                    "type": "method",
+                    "decorator": "wire",
+                    "loc": {
+                        "start": {
+                            "line": 81,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 89,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handleGetUserData",
+                    "type": "method",
+                    "decorator": "wire",
+                    "loc": {
+                        "start": {
+                            "line": 90,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 98,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "buildTableData",
+                    "type": "method",
+                    "loc": {
+                        "start": {
+                            "line": 100,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 102,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handleSearchTermChanged",
+                    "type": "method",
+                    "loc": {
+                        "start": {
+                            "line": 105,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 119,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handleRowSelection",
+                    "type": "method",
+                    "loc": {
+                        "start": {
+                            "line": 121,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 149,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handleFirstPageButtonClicked",
+                    "type": "property",
+                    "value": {
+                        "type": "unresolved"
+                    },
+                    "loc": {
+                        "start": {
+                            "line": 151,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 155,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handlePreviousPageButtonClicked",
+                    "type": "property",
+                    "value": {
+                        "type": "unresolved"
+                    },
+                    "loc": {
+                        "start": {
+                            "line": 156,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 160,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handleNextPageButtonClicked",
+                    "type": "property",
+                    "value": {
+                        "type": "unresolved"
+                    },
+                    "loc": {
+                        "start": {
+                            "line": 161,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 165,
+                            "column": 5
+                        }
+                    }
+                },
+                {
+                    "name": "handleLastPageButtonClicked",
+                    "type": "property",
+                    "value": {
+                        "type": "unresolved"
+                    },
+                    "loc": {
+                        "start": {
+                            "line": 166,
+                            "column": 4
+                        },
+                        "end": {
+                            "line": 170,
+                            "column": 5
+                        }
+                    }
+                }
+            ],
+            "declarationLoc": {
+                "start": {
+                    "line": 25,
+                    "column": 0
+                },
+                "end": {
+                    "line": 172,
+                    "column": 1
+                }
+            },
+            "doc": "",
+            "exports": [
+                {
+                    "type": "ExportDefaultDeclaration"
+                }
+            ]
+        },
+        "updatedAt": "2024-10-09T18:09:39.833Z"
+    }
+]

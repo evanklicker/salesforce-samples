@@ -8,6 +8,118 @@
     </values>
     <values>
         <field>Data__c</field>
-        <value xsi:type="xsd:string">[{&quot;key&quot;:&quot;sample JSON&quot;}]</value>
+        <value xsi:type="xsd:string">{
+    &quot;sObjectType&quot;: &quot;Account&quot;,
+    &quot;fields&quot;: [
+        &quot;Id&quot;,
+        &quot;IsDeleted&quot;,
+        &quot;Name&quot;,
+        &quot;Type&quot;,
+        &quot;BillingStreet&quot;,
+        &quot;BillingCity&quot;,
+        &quot;BillingState&quot;,
+        &quot;BillingPostalCode&quot;,
+        &quot;BillingCountry&quot;,
+        &quot;BillingLatitude&quot;,
+        &quot;BillingLongitude&quot;,
+        &quot;BillingGeocodeAccuracy&quot;,
+        &quot;BillingAddress&quot;,
+        &quot;ShippingStreet&quot;,
+        &quot;ShippingCity&quot;,
+        &quot;ShippingState&quot;,
+        &quot;ShippingPostalCode&quot;,
+        &quot;ShippingCountry&quot;,
+        &quot;ShippingLatitude&quot;,
+        &quot;ShippingLongitude&quot;,
+        &quot;ShippingGeocodeAccuracy&quot;,
+        &quot;ShippingAddress&quot;,
+        &quot;Phone&quot;,
+        &quot;Fax&quot;,
+        &quot;AccountNumber&quot;,
+        &quot;Website&quot;,
+        &quot;PhotoUrl&quot;,
+        &quot;Sic&quot;,
+        &quot;Industry&quot;,
+        &quot;AnnualRevenue&quot;,
+        &quot;NumberOfEmployees&quot;,
+        &quot;Ownership&quot;,
+        &quot;TickerSymbol&quot;,
+        &quot;Description&quot;,
+        &quot;Rating&quot;,
+        &quot;Site&quot;,
+        &quot;CreatedDate&quot;,
+        &quot;LastModifiedDate&quot;,
+        &quot;SystemModstamp&quot;,
+        &quot;LastActivityDate&quot;,
+        &quot;LastViewedDate&quot;,
+        &quot;LastReferencedDate&quot;,
+        &quot;Jigsaw&quot;,
+        &quot;CleanStatus&quot;,
+        &quot;AccountSource&quot;,
+        &quot;DunsNumber&quot;,
+        &quot;Tradestyle&quot;,
+        &quot;NaicsCode&quot;,
+        &quot;NaicsDesc&quot;,
+        &quot;YearStarted&quot;,
+        &quot;SicDesc&quot;,
+        &quot;CustomerPriority__c&quot;,
+        &quot;SLA__c&quot;,
+        &quot;Active__c&quot;,
+        &quot;NumberofLocations__c&quot;,
+        &quot;UpsellOpportunity__c&quot;,
+        &quot;SLASerialNumber__c&quot;,
+        &quot;SLAExpirationDate__c&quot;
+    ],
+    &quot;relationshipFields&quot;: [
+        {
+            &quot;fields&quot;: [
+                &quot;Id&quot;,
+                &quot;Name&quot;
+            ],
+            &quot;sObjectType&quot;: &quot;DandBCompany&quot;,
+            &quot;relationshipName&quot;: &quot;DandbCompany&quot;
+        },
+        {
+            &quot;fields&quot;: [
+                &quot;Id&quot;,
+                &quot;Name&quot;
+            ],
+            &quot;sObjectType&quot;: &quot;User&quot;,
+            &quot;relationshipName&quot;: &quot;LastModifiedBy&quot;
+        },
+        {
+            &quot;fields&quot;: [
+                &quot;Id&quot;,
+                &quot;Name&quot;
+            ],
+            &quot;sObjectType&quot;: &quot;User&quot;,
+            &quot;relationshipName&quot;: &quot;CreatedBy&quot;
+        },
+        {
+            &quot;fields&quot;: [
+                &quot;Id&quot;,
+                &quot;Name&quot;
+            ],
+            &quot;sObjectType&quot;: &quot;User&quot;,
+            &quot;relationshipName&quot;: &quot;Owner&quot;
+        },
+        {
+            &quot;fields&quot;: [
+                &quot;Id&quot;,
+                &quot;Name&quot;
+            ],
+            &quot;sObjectType&quot;: &quot;Account&quot;,
+            &quot;relationshipName&quot;: &quot;Parent&quot;
+        },
+        {
+            &quot;fields&quot;: [
+                &quot;Id&quot;,
+                &quot;Name&quot;
+            ],
+            &quot;sObjectType&quot;: &quot;Account&quot;,
+            &quot;relationshipName&quot;: &quot;MasterRecord&quot;
+        }
+    ]
+}</value>
     </values>
 </CustomMetadata>

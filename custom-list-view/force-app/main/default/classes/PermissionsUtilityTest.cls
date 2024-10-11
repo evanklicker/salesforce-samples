@@ -84,6 +84,16 @@ public class PermissionsUtilityTest {
         }
     }
     
+    @isTest
+    static void isFieldEditable() {
+        
+        Test.startTest();
+        Boolean result = PermissionsUtility.isFieldEditable('Account.Parent.MasterRecord.Owner.Name');
+        Test.stopTest();
+        
+        System.debug(result);
+    }
+    
     /*
      * 	Not adding them right now for brevity, but basically copy/paste the above tests for the other permissions. Create, Edit, Delete, maybe some of the weird ones too.
      */
@@ -120,4 +130,5 @@ public class PermissionsUtilityTest {
         }
         return result;
     }
+    
 }

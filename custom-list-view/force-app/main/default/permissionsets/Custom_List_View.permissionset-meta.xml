@@ -19,11 +19,6 @@
         <field>User_Application_Data__c.Data__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>User_Application_Data__c.User__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Custom List View</label>
     <objectPermissions>

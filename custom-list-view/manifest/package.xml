@@ -5,6 +5,7 @@
         <members>CustomListViewControllerTest</members>
         <members>PermissionsUtility</members>
         <members>PermissionsUtilityTest</members>
+        <members>SchemaUtility</members>
         <name>ApexClass</name>
     </types>
     <types>
