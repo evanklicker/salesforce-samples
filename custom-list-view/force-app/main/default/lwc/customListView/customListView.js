@@ -1,6 +1,7 @@
 import { wire, LightningElement } from 'lwc';
 import generateData from './generateData';
 import { TableData } from './customListViewHelper';
+import DualListBoxModal from 'c/dualListBoxModal';
 import getTableData from '@salesforce/apex/CustomListViewController.getTableData';
 import getUserData from '@salesforce/apex/CustomListViewController.getUserData';
 import saveUserData from '@salesforce/apex/CustomListViewController.saveUserData';
@@ -21,8 +22,13 @@ const columns = [
     should be put in the helper file, and this file should be mostly kept to variable assignments and callouts to that file.
 */
 
+let SELECT_COLUMNS_MODAL_LABEL = 'Select Fields to Display';
+let SELECT_COLUMNS_MODAL_SOURCE_LABEL = 'Available Fields';
+let SELECT_COLUMNS_MODAL_SELECTED_LABEL = 'Visible Fields';
+
 export default class DatatableWithInlineEdit extends LightningElement {
     columns = columns;
+    displayedColumns = [];
     draftValues = [];
     pageSize = 20;
     pages;
@@ -60,8 +66,6 @@ export default class DatatableWithInlineEdit extends LightningElement {
         return `${this.selectedRows.size} items selected`;
     }
     connectedCallback() {
-        //this.data = generateData({ amountOfRecords: 305 });
-        //if (!this.data || this.data.length === 0) { return; } // probably want to display an error in this case
     }
 
     @wire(getTableData) 
@@ -77,6 +81,8 @@ export default class DatatableWithInlineEdit extends LightningElement {
             if (!data.records) { throw new Error('No records found!'); }
             this.datatableTitle = `Accounts (${data.records.length})`;
             this.columns = this.createColumnDefs(data.fields);
+            // This will need to be changed when User Preferences get incorporated
+            this.displayedColumns = this.columns;
             this.data = data.records;
             this.tableData = this.buildTableData({data: this.data, pageSize: this.pageSize});
             this.pages = this.tableData.pages;
@@ -145,6 +151,29 @@ export default class DatatableWithInlineEdit extends LightningElement {
 
     buildTableData({data, pageSize, filters, searchCriterion, sortOrder, sortField}) {
         return new TableData(data || this.data, pageSize || this.tableData.pageSize, filters, searchCriterion || this.searchTerm, sortOrder, sortField);
+    }
+
+    async handleMenuSelect(event) {
+        const selectedItemValue = event.detail.value;
+        switch (selectedItemValue) {
+            case 'selectFields':
+                let result = await DualListBoxModal.open({
+                    options: this.columns.map(column => { return { label: column.label, value: column.label }; }),
+                    selected: this.displayedColumns.map(column => { return { label: column.label, value: column.label }; }),
+                    label: SELECT_COLUMNS_MODAL_LABEL,
+                    sourceLabel: SELECT_COLUMNS_MODAL_SOURCE_LABEL,
+                    selectedLabel: SELECT_COLUMNS_MODAL_SELECTED_LABEL,
+                    max: 15, // This is the case for built-in list views, so I'll go with it for now
+                    size: "small"
+                });
+                console.log(`Select columns modal returned with result:  ${JSON.stringify(result)}`);
+                if (result && Array.isArray(result) && result.length > 0) {
+                    this.displayedColumns = this.columns.filter(column => result.includes(column.label));
+                    console.log(JSON.stringify(this.displayedColumns));
+                } else {
+                    console.warn('Unexpected result from saving columns');
+                }
+        }
     }
 
     // When the user types into the box, wait for a bit before running the search to give them an opportunity to finish typing before removing their control

@@ -3,6 +3,11 @@
         <lightning-card title={datatableTitle}>
             <lightning-formatted-text class="slds-p-left_medium" value={selectedRowsText}></lightning-formatted-text>
             <lightning-input class="slds-p-around_small" label="" placeholder="Search records..." type="search" onchange={handleSearchTermChanged}></lightning-input>
+            <div slot="actions">
+                <lightning-button-menu alternative-text="List view settings" variant="border-filled" icon-name="utility:settings" onselect={handleMenuSelect}>
+                    <lightning-menu-item value="selectFields" label="Select Fields to Display"></lightning-menu-item>
+                </lightning-button-menu>
+            </div>
             <div class="spinnerContainer" style="height: 300px">        
                 <div if:true={isLoading}>
                     <lightning-spinner class="spinnerClass" alternative-text="Loading..."></lightning-spinner>
@@ -14,7 +19,7 @@
                         selected-rows={displayedSelectedRows}
                         show-row-number-column
                         draft-values={draftValues}
-                        columns={columns}>
+                        columns={displayedColumns}>
                 </lightning-datatable>
             </div>
             <div slot="footer"> 
