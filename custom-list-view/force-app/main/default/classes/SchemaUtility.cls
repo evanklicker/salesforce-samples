@@ -15,4 +15,8 @@ public class SchemaUtility {
         return globalDescribe.get(objectName).getDescribe().fields.getMap().get(fieldName).getDescribe().getType();
     }
     
+    public static String getLabel(String objectName, String fieldName) {
+        return globalDescribe.get(objectName).getDescribe().fields.getMap().get(fieldName).getDescribe().getLabel();
+    }
+    
 }

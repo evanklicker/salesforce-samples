@@ -21,7 +21,7 @@ public with sharing class CustomListViewController {
         tableData.sObjectType = sObjectType;
         for (String field : fields) {
             if (PermissionsUtility.isFieldAccessible(sObjectType, field)) {
-                columns.add(new Column(sObjectType, field, SchemaUtility.getType(sObjectType, field).name(), PermissionsUtility.isFieldUpdateable(sObjectType, field)));
+                columns.add(new Column(sObjectType, field, SchemaUtility.getLabel(sObjectType, field), SchemaUtility.getType(sObjectType, field).name(), PermissionsUtility.isFieldUpdateable(sObjectType, field)));
             }
         }
         
@@ -45,7 +45,8 @@ public with sharing class CustomListViewController {
             for (String relationshipField : relationshipFields) {
                 if (PermissionsUtility.isFieldAccessible(relationshipSObjectType, relationshipField)) {
                     columns.add(new Column(relationshipSObjectType, 
-                                           relationshipField, 
+                                           relationshipField,
+                                           SchemaUtility.getLabel(relationshipSObjectType, relationshipField),
                                            SchemaUtility.getType(relationshipSObjectType, relationshipField).name(), 
                                            PermissionsUtility.isFieldUpdateable(relationshipSObjectType, relationshipField), 
                                            relationshipName)
@@ -128,19 +129,21 @@ public with sharing class CustomListViewController {
     public class Column {
         @AuraEnabled public String sObjectType;
         @AuraEnabled public String name;
+        @AuraEnabled public String label;
         @AuraEnabled public String type;
         @AuraEnabled public String relationshipName;
         @AuraEnabled public Boolean isUpdateable;
         
-        public Column(String sObjectType, String field, String type, Boolean isUpdateable) {
+        public Column(String sObjectType, String field, String label, String type, Boolean isUpdateable) {
             this.sObjectType = sObjectType;
             this.name = field;
+            this.label = label;
             this.type = type;
             this.isUpdateable = isUpdateable;
         }
         
-        public Column(String sObjectType, String field, String type, Boolean isUpdateable, String relationshipName) {
-            this(sObjectType, field, type, isUpdateable);
+        public Column(String sObjectType, String field, String label, String type, Boolean isUpdateable, String relationshipName) {
+            this(sObjectType, field, label, type, isUpdateable);
             this.relationshipName = relationshipName;
         }
     }
