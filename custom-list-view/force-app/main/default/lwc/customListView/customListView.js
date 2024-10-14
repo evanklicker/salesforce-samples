@@ -60,9 +60,8 @@ export default class DatatableWithInlineEdit extends LightningElement {
         return [...this.tableData.getPageData(this.currentPage)];
     }
     get displayedSelectedRows() {
-        // let displayedData = new Set(this.displayedData.map(row => row.id));
-        // return [...displayedData.intersection(this.selectedRows)];
-        return [];
+        let displayedData = new Set(this.displayedData.map(row => row.Id));
+        return [...displayedData.intersection(this.selectedRows)];
     }
     get selectedRowsText() {
         if (this.selectedRows.size === 1) {
@@ -260,27 +259,22 @@ export default class DatatableWithInlineEdit extends LightningElement {
     handleRowSelection(event) {
         switch (event.detail.config.action) {
             case 'selectAllRows':
-                console.log('selectAllRows');
                 for (let i = 0; i < event.detail.selectedRows.length; i++) {
-                    this.selectedRows.add(event.detail.selectedRows[i].id);
+                    this.selectedRows.add(event.detail.selectedRows[i].Id);
                 }
                 break;
             case 'deselectAllRows':
-                console.log('deselectAllRows');
                 this.displayedData.forEach(row => {
-                    this.selectedRows.delete(row.id);
+                    this.selectedRows.delete(row.Id);
                 });
                 break;
             case 'rowSelect':
-                console.log('rowSelect');
                 this.selectedRows.add(event.detail.config.value);
                 break;
             case 'rowDeselect':
-                console.log('rowDeselect');
                 this.selectedRows.delete(event.detail.config.value);
                 break;
             default:
-                console.log('default');
                 return;
         }
         // making a new set so that the front-end detects a change and updates things accordingly
