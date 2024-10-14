@@ -1,7 +1,15 @@
 <template>
     <lightning-modal-header label={label}></lightning-modal-header>
     <lightning-modal-body>
-        <lightning-dual-listbox label="" min={min} max={max} source-label={sourceLabel} selected-label={selectedLabel} options={options} onchange={handleChange}>
+        <lightning-dual-listbox 
+            label="" 
+            min={min} 
+            max={max} 
+            source-label={sourceLabel} 
+            selected-label={selectedLabel} 
+            options={options} 
+            value={values} 
+            onchange={handleChange}>
         </lightning-dual-listbox>
     </lightning-modal-body>
     <lightning-modal-footer>

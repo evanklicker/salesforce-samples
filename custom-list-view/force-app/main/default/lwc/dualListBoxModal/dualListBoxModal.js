@@ -5,6 +5,7 @@ export default class DualListBoxModal extends LightningModal {
 
     @api options;
     @api selected;
+    @api values; // Used for pre-populating
     @api label;
     @api sourceLabel;
     @api selectedLabel;

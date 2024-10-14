@@ -39,6 +39,8 @@ export default class DatatableWithInlineEdit extends LightningElement {
     selectedRows = new Set();
     tableData = new TableData();
 
+    getUserDataFinished = false;
+
     searchTimeout;
     searchTerm;
     // can be tuned to user preferences. Power users may want this lower, but I probably wouldn't go lower than 1 sec or higher than 2 sec
@@ -82,7 +84,9 @@ export default class DatatableWithInlineEdit extends LightningElement {
             this.datatableTitle = `Accounts (${data.records.length})`;
             this.columns = this.createColumnDefs(data.fields);
             // This will need to be changed when User Preferences get incorporated
-            this.displayedColumns = this.columns;
+            if (this.getUserDataFinished) {
+                this.displayedColumns = this.setupDisplayedColumns(this.columns, this.userData);
+            }
             this.data = this.prepareTableData(data.records);
             this.tableData = this.buildTableData({ data: this.data, pageSize: this.pageSize });
             this.pages = this.tableData.pages;
@@ -93,13 +97,29 @@ export default class DatatableWithInlineEdit extends LightningElement {
     @wire(getUserData)
     handleGetUserData({ data, error }) {
         if (error) {
+            this.getUserDataFinished = true;
+            console.log('getUserData error!');
             this.error = error;
             console.error(error);
         } else if (data) {
+            this.getUserDataFinished = true;
+            console.log('getUserData data found!');
             console.log(data);
-            this.userData = data;
+            this.userData = JSON.parse(data.Data__c);
+            if (this.columns) {
+                this.displayedColumns = this.setupDisplayedColumns(this.columns, this.userData);
+            }
             this.error = null;
         }
+    }
+
+    setupDisplayedColumns(columns, userData) {
+        return columns.filter(column => {
+            return (userData.find(data => {
+                // Not 100% sure this is the best way to compare two columns to see if they are the same
+                return data.label == column.label && data.type == column.type && data.fieldName == column.fieldName;
+            }) != null);
+        })
     }
 
     createColumnDefs(rawFieldInfos) {
@@ -198,9 +218,11 @@ export default class DatatableWithInlineEdit extends LightningElement {
         const selectedItemValue = event.detail.value;
         switch (selectedItemValue) {
             case 'selectFields':
+                console.log('Selecting new columns to display...');
+                console.log(JSON.stringify(this.displayedColumns.map(column => { return { label: column.label, value: column.label }; })));
                 let result = await DualListBoxModal.open({
                     options: this.columns.map(column => { return { label: column.label, value: column.label }; }),
-                    selected: this.displayedColumns.map(column => { return { label: column.label, value: column.label }; }),
+                    values: this.displayedColumns.map(column => column.label),
                     label: SELECT_COLUMNS_MODAL_LABEL,
                     sourceLabel: SELECT_COLUMNS_MODAL_SOURCE_LABEL,
                     selectedLabel: SELECT_COLUMNS_MODAL_SELECTED_LABEL,
@@ -210,6 +232,7 @@ export default class DatatableWithInlineEdit extends LightningElement {
                 console.log(`Select columns modal returned with result:  ${JSON.stringify(result)}`);
                 if (result && Array.isArray(result) && result.length > 0) {
                     this.displayedColumns = this.columns.filter(column => result.includes(column.label));
+                    saveUserData({userData: JSON.stringify(this.displayedColumns)});
                     console.log(JSON.stringify(this.displayedColumns));
                 } else {
                     console.warn('Unexpected result from saving columns');
