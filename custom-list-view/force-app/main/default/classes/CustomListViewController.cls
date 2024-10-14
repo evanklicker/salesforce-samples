@@ -1,14 +1,62 @@
 public with sharing class CustomListViewController {
 
     public static final String APPLICATION_NAME = 'CustomListView';
-
-    @testVisible
-    static CustomListViewDataProvider dataProvider = new CustomListViewDataProvider();
     
-    public static TableData getFields() {
-        TableData tableData = new TableData();
-        Map<String, Object> fieldData = (Map<String, Object>) JSON.deserializeUntyped(dataProvider.getColumnData_Metadata());
+    @testVisible static CustomListViewDataProvider dataProvider = new CustomListViewDataProvider();
+    
+    @AuraEnabled(cacheable=true)
+    public static User_Application_Data__c getUserData() {
+        List<User_Application_Data__c> results = dataProvider.getUserData();
+        if (results.size() == 0) {
+            return new User_Application_Data__c(Application__c = APPLICATION_NAME);
+        }
+        return results[0];
+    }
+    
+    // This has two purposes - get the column defs (that the current user has access to) and the data for those columns
+    @AuraEnabled(cacheable=true)
+    public static TableData getTableData() {
+        TableData tableData = getFields();
+        tableData.records = getRecords(tableData);
+        return tableData;
+    }
+
+    @AuraEnabled
+    public static void saveUserData(String userData) {
+        List<User_Application_Data__c> results = dataProvider.getUserData();
+        if (results.size() > 1) {
+            // delete records?
+            return;
+        } else if (results.size() == 1) {
+            results[0].Data__c = userData;
+            dataProvider.saveUserData(results[0]);
+        } else {
+            dataProvider.saveUserData(new User_Application_Data__c(Data__c = userData, Application__c = APPLICATION_NAME));
+        }
+    }
+    
+    static TableData getFields() {
+        List<App_Config__mdt> columnConfigs = dataProvider.getColumnData_Metadata();
+        String appConfigData;
+        if (columnConfigs.size() > 1) {
+            //idk
+        } else if (columnConfigs.size() == 1) {
+            appConfigData = columnConfigs[0].Data__c;
+        } else {
+            throw new NoDataFoundException();
+        }
+        Map<String, Object> fieldData = (Map<String, Object>) JSON.deserializeUntyped(appConfigData);
         String sObjectType = (String) fieldData.get('sObjectType');
+		List<Column> columns = getRegularColumns(fieldData, sObjectType);
+        TableData tableData = new TableData();
+        tableData.fields = columns;
+        tableData.sObjectType = sObjectType;
+        List<Column> relationshipColumns = getRelationshipColumns(fieldData);
+        tableData.fields.addAll(relationshipColumns);
+        return tableData;
+    }
+    
+    static List<Column> getRegularColumns(Map<String, Object> fieldData, String sObjectType) {
         List<String> fields = new List<String>();
         for (Object fieldName : (List<Object>) fieldData.get('fields')) {
         	fields.add((String) fieldName);
@@ -17,23 +65,25 @@ public with sharing class CustomListViewController {
             throw new NoDataFoundException();
         }
         List<Column> columns = new List<Column>();
-        tableData.fields = columns;
-        tableData.sObjectType = sObjectType;
         for (String field : fields) {
-            if (PermissionsUtility.isFieldAccessible(sObjectType, field)) {
-                columns.add(new Column(sObjectType, field, SchemaUtility.getLabel(sObjectType, field), SchemaUtility.getType(sObjectType, field).name(), PermissionsUtility.isFieldUpdateable(sObjectType, field)));
+            if (dataProvider.isFieldAccessible(sObjectType, field)) {
+                columns.add(new Column(sObjectType, field, dataProvider.getLabel(sObjectType, field), dataProvider.getType(sObjectType, field).name(), dataProvider.isFieldUpdateable(sObjectType, field)));
             }
         }
-        
-        // Everything from here to the end is concerning relationship fields
-        // This might need to be recursive to handle multi-level relationships. As it stands, it can only do one level
+        return columns;
+    }
+    
+    // This function is mostly for organizational and testability reasons
+    static List<Column> getRelationshipColumns(Map<String, Object> fieldData) {
+        List<Column> columns = new List<Column>();
         List<Map<String, Object>> relationshipFieldInfos = new List<Map<String, Object>>();
         for (Object fieldInfo : (List<Object>) fieldData.get('relationshipFields')) {
             relationshipFieldInfos.add((Map<String, Object>) fieldInfo);
         }
         if (relationshipFieldInfos == null || relationshipFieldInfos.isEmpty()) {
-    		return tableData;
+    		return columns;
         }
+        // This might need to be recursive to handle multi-level relationships. As it stands, it can only do one level
         for (Map<String, Object> relationship : relationshipFieldInfos) {
             String relationshipSObjectType = (String) relationship.get('sObjectType');
             String relationshipName = (String) relationship.get('relationshipName');
@@ -41,20 +91,19 @@ public with sharing class CustomListViewController {
             for (Object relationshipFieldName : (List<Object>) relationship.get('fields')) {
                 relationshipFields.add((String) relationshipFieldName);
             }
-            if (relationshipSObjectType == null || relationshipName == null || relationshipFields == null || relationshipFields.isEmpty()) { return tableData; }
+            if (relationshipSObjectType == null || relationshipName == null || relationshipFields == null || relationshipFields.isEmpty()) { return columns; }
             for (String relationshipField : relationshipFields) {
-                if (PermissionsUtility.isFieldAccessible(relationshipSObjectType, relationshipField)) {
+                if (dataProvider.isFieldAccessible(relationshipSObjectType, relationshipField)) {
                     columns.add(new Column(relationshipSObjectType, 
                                            relationshipField,
-                                           SchemaUtility.getLabel(relationshipSObjectType, relationshipField),
-                                           SchemaUtility.getType(relationshipSObjectType, relationshipField).name(), 
-                                           PermissionsUtility.isFieldUpdateable(relationshipSObjectType, relationshipField), 
-                                           relationshipName)
-                               );
+                                           dataProvider.getLabel(relationshipSObjectType, relationshipField),
+                                           dataProvider.getType(relationshipSObjectType, relationshipField).name(), 
+                                           dataProvider.isFieldUpdateable(relationshipSObjectType, relationshipField), 
+                                           relationshipName));
                 }
             }
         }
-        return tableData;
+        return columns;
     }
     
     // There are a number of improvements that could be made to this. First off - it only supports 2000 records,
@@ -73,46 +122,8 @@ public with sharing class CustomListViewController {
         }
         // If there are single quotes, then this query will definitely be malformed. But hey, at least it's not susceptible to injection
         String query = 'SELECT ' + String.escapeSingleQuotes(String.join(queryFields, ', ')) + ' FROM ' + String.escapeSingleQuotes(tableData.sObjectType) + ' WITH SECURITY_ENFORCED';
-        System.debug(query);
-        return Database.query(query);
+        return dataProvider.query(query);
     } 
-
-    public static List<Account> getRecords() {
-        return dataProvider.getRecords();
-    }
-
-    @AuraEnabled(cacheable=true)
-    public static User_Application_Data__c getUserData() {
-        List<User_Application_Data__c> results = dataProvider.getUserData();
-        if (results.size() == 0) {
-            return new User_Application_Data__c(Application__c = APPLICATION_NAME);
-        }
-        return results[0];
-    }
-    
-    // This has two purposes - get the column defs (that the current user has access to) and the data for those columns
-    @AuraEnabled(cacheable=true)
-    public static TableData getTableData() {
-        TableData tableData = getFields();
-        tableData.records = getRecords(tableData);
-        System.debug('About to return table data to front-end!');
-        System.debug(tableData);
-        return tableData;
-    }
-
-    @AuraEnabled
-    public static void saveUserData(String userData) {
-        List<User_Application_Data__c> results = dataProvider.getUserData();
-        if (results.size() > 1) {
-            // delete records?
-            return;
-        } else if (results.size() == 1) {
-            results[0].Data__c = userData;
-            dataProvider.saveUserData(results[0]);
-        } else {
-            dataProvider.saveUserData(new User_Application_Data__c(Data__c = userData, Application__c = APPLICATION_NAME));
-        }
-    }
     
     /*
      * The idea with this is to get the column definition metadata from the custom metadata record, check those field against the permissions utility to
@@ -152,16 +163,6 @@ public with sharing class CustomListViewController {
     // Not always extremely necessary for controllers, which are typically pretty simple
     @testVisible
     virtual class CustomListViewDataProvider {
-        
-        // I'm struggling to find documentation about it, but I guess you don't need `virtual` for these
-        // You also don't need to use `override` for the test data provider extending this. *shrug*
-
-        @testVisible
-        virtual List<Account> getRecords() {
-            // Not 100% sold on selectors for everything, so maybe just query here
-            // return AccountSelector.query('');
-            return new List<Account>();
-        }
 
         @testVisible
         virtual List<User_Application_Data__c> getUserData() {
@@ -174,18 +175,8 @@ public with sharing class CustomListViewController {
         }
 
         @testVisible
-        virtual String getColumnData_Metadata() {
-            // This method just puts the columns JSON string into custom metadata.
-            // That way you can manage the displayed data without needing to do deployments
-            // TODO: Make this type and record and fill these in
-            List<App_Config__mdt> columnConfigs = [SELECT Id, Application__c, Data__c FROM App_Config__mdt WHERE Application__c = :APPLICATION_NAME];
-            if (columnConfigs.size() > 1) {
-                //idk
-            } else if (columnConfigs.size() == 1) {
-                return columnConfigs[0].Data__c;
-            }
-            return '[{"default":"not implemented"}]';
-            // add some default option with a VERY limited number of columns. Just like, Name, and nothing else
+        virtual List<App_Config__mdt> getColumnData_Metadata() {
+            return [SELECT Id, Application__c, Data__c FROM App_Config__mdt WHERE Application__c = :APPLICATION_NAME];
         }
 
         // It makes more sense for me to use Schema.SObjectField here, but only the Schema.DescribeFieldResult class is serializable. Oh well
@@ -201,6 +192,31 @@ public with sharing class CustomListViewController {
 				columns.add(field.getDescribe());
             }
             return columns;
+        }
+        
+        @testVisible
+        virtual Boolean isFieldAccessible(String sObjectType, String fieldName) {
+            return PermissionsUtility.isFieldAccessible(sObjectType, fieldName);
+        }
+        
+        @testVisible
+        virtual Boolean isFieldUpdateable(String sObjectType, String fieldName) {
+            return PermissionsUtility.isFieldUpdateable(sObjectType, fieldName);
+        }
+        
+        @testVisible
+        virtual String getLabel(String sObjectType, String fieldName) {
+            return SchemaUtility.getLabel(sObjectType, fieldName);
+        }
+        
+        @testVisible
+        virtual Schema.DisplayType getType(String sObjectType, String fieldName) {
+            return SchemaUtility.getType(sObjectType, fieldName);
+        }
+        
+        @testVisible
+        virtual List<SObject> query(String query) {
+            return Database.query(query);
         }
 
         // Alternatively, you might be able to use field sets for the column list. Not sure that

@@ -94,3 +94,105 @@ export class TableData {
     }
 
 }
+
+let SELECT_COLUMNS_MODAL_LABEL = 'Select Fields to Display';
+let SELECT_COLUMNS_MODAL_SOURCE_LABEL = 'Available Fields';
+let SELECT_COLUMNS_MODAL_SELECTED_LABEL = 'Visible Fields';
+export function getColumnSelectorParams(columns, displayedColumns) {
+    return {
+        options: columns.map(column => { return { label: column.label, value: column.label }; }),
+        values: displayedColumns.map(column => column.label),
+        label: SELECT_COLUMNS_MODAL_LABEL,
+        sourceLabel: SELECT_COLUMNS_MODAL_SOURCE_LABEL,
+        selectedLabel: SELECT_COLUMNS_MODAL_SELECTED_LABEL,
+        max: 15, // This is the case for built-in list views, so I'll go with it for now
+        size: "small"
+    }
+}
+
+export function prepareTableData(records) {
+    let result = records.map(record => {
+        return flattenObject(record);
+    });
+    // Setup the url fields to make sobject links work
+    result.forEach(record => {
+        for (let prop in record) {
+            if (prop.endsWith('Id')) {
+                record[`${prop.slice(0, prop.length-2)}Url`] = `/${record[prop]}`;
+            }
+        }
+    });
+    return result;
+}
+
+function flattenObject(obj, delimiter = '', prefix = '') {
+    return Object.keys(obj).reduce((acc, k) => {
+        const pre = prefix.length ? `${prefix}${delimiter}` : '';
+        if (typeof obj[k] === 'object' && obj[k] !== null && Object.keys(obj[k]).length > 0) {
+            Object.assign(acc, this.flattenObject(obj[k], delimiter, pre + k));
+        }
+        else acc[pre + k] = obj[k];
+        return acc;
+    }, {});
+}
+
+export function createColumnDefs(rawFieldInfos) {
+    return rawFieldInfos.map(field => {
+        // Remove the Name field since it's incorporated into the Id field def
+        if (field.name.endsWith('Name')) { return; }
+        let column;
+        if (field.name.endsWith('Id')) {
+            column = setupIdColumn(field);
+        } else {
+            column = setupNormalColumn(field);
+        }
+        return column;
+    }).filter(column => !!column);
+}
+
+function setupIdColumn(fieldInfo) {
+    let fieldNameBase = (fieldInfo.relationshipName || '') + fieldInfo.name.slice(0, fieldInfo.name.length - 2);
+    return {
+        // I think we're eventually gonna need to override every field proivded by the base implementation..
+        ...this.setupNormalColumn(fieldInfo),
+        // We will probably need to add something like, `relationshipLabel` or something like that, 'cuz I don't think we
+        // can generate a nice user-facing column label with what we currently have
+        label: `${fieldInfo.relationshipName ? (fieldInfo.relationshipName + ' ') : ''}${fieldInfo.name.endsWith('Id') ? 'Name' : fieldInfo.label}`,
+        fieldName: `${fieldNameBase}Url`,
+        typeAttributes: {
+            label: {fieldName: `${fieldInfo.relationshipName || ''}Name` }
+        },
+        iconName: fieldInfo.iconName || 'standard:' + fieldInfo.sObjectType.toLowerCase()
+    }
+}
+
+function setupNormalColumn(fieldInfo) {
+    return {
+        // Don't use Id fields as labels - use them for urls instead
+        label: (fieldInfo.relationshipName || '') + fieldInfo.label,
+        type: convertType(fieldInfo.type.toLowerCase()),
+        fieldName: (fieldInfo.relationshipName || '') + fieldInfo.name,
+        editable: fieldInfo.isUpdateable,
+        sortable: !!fieldInfo.sortable
+    }
+}
+
+function convertType(type) {
+    switch (type) {
+        case 'boolean': case 'currency':
+            return type;
+        case 'picklist': case 'string': case 'textarea': case 'phone': case 'address':
+            return 'text';
+        case 'int': case 'double':
+            return 'number';
+        case 'reference': case 'url': case 'id':
+            return 'url';
+        case 'date': 
+            return 'date';
+        case 'datetime':
+            // The formatting for this is non-existant, so we'll need to figure something out here
+            return 'date';
+        default:
+            return 'text';
+    }
+}
