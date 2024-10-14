@@ -6,7 +6,7 @@ import getUserData from '@salesforce/apex/CustomListViewController.getUserData';
 import saveUserData from '@salesforce/apex/CustomListViewController.saveUserData';
 
 export default class DatatableWithInlineEdit extends LightningElement {
-    columns = columns;
+    columns = [];
     displayedColumns = [];
     draftValues = [];
     pageSize = 20;

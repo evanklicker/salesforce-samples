@@ -129,7 +129,7 @@ function flattenObject(obj, delimiter = '', prefix = '') {
     return Object.keys(obj).reduce((acc, k) => {
         const pre = prefix.length ? `${prefix}${delimiter}` : '';
         if (typeof obj[k] === 'object' && obj[k] !== null && Object.keys(obj[k]).length > 0) {
-            Object.assign(acc, this.flattenObject(obj[k], delimiter, pre + k));
+            Object.assign(acc, flattenObject(obj[k], delimiter, pre + k));
         }
         else acc[pre + k] = obj[k];
         return acc;
@@ -154,7 +154,7 @@ function setupIdColumn(fieldInfo) {
     let fieldNameBase = (fieldInfo.relationshipName || '') + fieldInfo.name.slice(0, fieldInfo.name.length - 2);
     return {
         // I think we're eventually gonna need to override every field proivded by the base implementation..
-        ...this.setupNormalColumn(fieldInfo),
+        ...setupNormalColumn(fieldInfo),
         // We will probably need to add something like, `relationshipLabel` or something like that, 'cuz I don't think we
         // can generate a nice user-facing column label with what we currently have
         label: `${fieldInfo.relationshipName ? (fieldInfo.relationshipName + ' ') : ''}${fieldInfo.name.endsWith('Id') ? 'Name' : fieldInfo.label}`,
