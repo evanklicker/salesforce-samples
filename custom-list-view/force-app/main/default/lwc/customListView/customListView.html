@@ -15,11 +15,14 @@
                 <lightning-datatable
                         key-field="Id"
                         data={displayedData}
+                        columns={displayedColumns}
                         onrowselection={handleRowSelection}
                         selected-rows={displayedSelectedRows}
                         show-row-number-column
                         draft-values={draftValues}
-                        columns={displayedColumns}>
+                        sorted-direction={sortDirection}
+                        sorted-by={sortedBy}
+                        onsort={handleSort}>
                 </lightning-datatable>
             </div>
             <div slot="footer"> 

@@ -1,5 +1,5 @@
 import { wire, LightningElement } from 'lwc';
-import { TableData, getColumnSelectorParams, prepareTableData, createColumnDefs } from './customListViewHelper';
+import { TableData, getColumnSelectorParams, prepareTableData, createColumnDefs, sortBy } from './customListViewHelper';
 import DualListBoxModal from 'c/dualListBoxModal';
 import getTableData from '@salesforce/apex/CustomListViewController.getTableData';
 import getUserData from '@salesforce/apex/CustomListViewController.getUserData';
@@ -22,6 +22,9 @@ export default class DatatableWithInlineEdit extends LightningElement {
     searchTerm;
     // can be tuned to user preferences. Power users may want this lower, but I probably wouldn't go lower than 1 sec or higher than 2 sec
     SEARCH_TIMEOUT_DURATION = 1000;
+
+    sortedBy;
+    sortDirection = 'asc';
 
     get pageLeftDisabled() {
         return this.currentPage === 1;
@@ -73,13 +76,10 @@ export default class DatatableWithInlineEdit extends LightningElement {
     handleGetUserData({ data, error }) {
         if (error) {
             this.getUserDataFinished = true;
-            console.log('getUserData error!');
             this.error = error;
             console.error(error);
         } else if (data) {
             this.getUserDataFinished = true;
-            console.log('getUserData data found!');
-            console.log(data);
             this.userData = JSON.parse(data.Data__c);
             if (this.columns) {
                 this.displayedColumns = this.setupDisplayedColumns(this.columns, this.userData);
@@ -97,26 +97,35 @@ export default class DatatableWithInlineEdit extends LightningElement {
         })
     }
 
-    buildTableData({ data, pageSize, filters, searchCriterion, sortOrder, sortField }) {
-        return new TableData(data || this.data, pageSize || this.tableData.pageSize, filters, searchCriterion || this.searchTerm, sortOrder, sortField);
+    buildTableData({ data, pageSize, filters, searchCriterion: searchTerm, sortDirection, sortedBy }) {
+        return new TableData(
+            data || this.data, 
+            pageSize || this.tableData.pageSize, 
+            filters, 
+            searchTerm || this.searchTerm, 
+            sortDirection || this.sortDirection, 
+            sortedBy || this.sortedBy);
     }
 
     async handleMenuSelect(event) {
         const selectedItemValue = event.detail.value;
         switch (selectedItemValue) {
             case 'selectFields':
-                console.log('Selecting new columns to display...');
-                console.log(JSON.stringify(this.displayedColumns.map(column => { return { label: column.label, value: column.label }; })));
                 let result = await DualListBoxModal.open(getColumnSelectorParams(this.columns, this.displayedColumns));
-                console.log(`Select columns modal returned with result:  ${JSON.stringify(result)}`);
                 if (result && Array.isArray(result) && result.length > 0) {
                     this.displayedColumns = this.columns.filter(column => result.includes(column.label));
-                    saveUserData({userData: JSON.stringify(this.displayedColumns)});
-                    console.log(JSON.stringify(this.displayedColumns));
+                    saveUserData({ userData: JSON.stringify(this.displayedColumns) });
                 } else {
-                    console.warn('Unexpected result from saving columns');
+                    console.error('Unexpected result from saving columns');
                 }
         }
+    }
+
+    handleSort(event) {
+        ({ fieldName: this.sortedBy, sortDirection: this.sortDirection } = event.detail);
+        console.log(this.sortedBy);
+        console.log(this.sortDirection);
+        this.tableData = this.buildTableData({sortDirection: this.sortDirection, sortedBy: this.sortedBy});
     }
 
     // When the user types into the box, wait for a bit before running the search to give them an opportunity to finish typing before removing their control
@@ -125,7 +134,7 @@ export default class DatatableWithInlineEdit extends LightningElement {
         this.searchTimeout = window.setTimeout(() => {
             try {
                 this.searchTerm = event.detail.value;
-                this.tableData = this.buildTableData({ searchCriterion: this.searchTerm });
+                this.tableData = this.buildTableData({ searchTerm: this.searchTerm });
                 this.handleFirstPageButtonClicked();
             } catch (e) {
                 console.error(e);

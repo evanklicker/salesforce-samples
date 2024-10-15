@@ -11,8 +11,8 @@ export class TableData {
     pages;
     filters;
     searchCriterion;
-    sortOrder;
-    sortField;
+    sortDirection;
+    sortedBy;
     
     pagedData = [];
 
@@ -23,7 +23,6 @@ export class TableData {
         // maybe something like this? Filter: {field: 'string', operator: 'string', filterValue: 'string' }
         this.filters = filters;
         this.searchCriterion = searchCriterion;
-        console.log(searchCriterion);
         this.sortOrder = sortOrder;
         this.sortField = sortField;
         this.buildPage();
@@ -34,7 +33,6 @@ export class TableData {
         return this.pagedData[page-1];
     }
 
-    // Probably will end up returning an object with all the necessary params (pages, searchHighlighting? displayedData. maybe more?) to keep this functional
     buildPage() {
         if (!this.data || this.data.length === 0) { return [] }
         let data = this.applyFilters(this.data, this.filters);
@@ -67,19 +65,18 @@ export class TableData {
         });
     }
 
-    sort(data, sortOrder, sortField) {
-        // This code probably isn't right, but it gives an idea of how I plan on doing this
-        // return data.sort((a, b) => {
-        //     let order = 1;
-        //     if (sortOrder == 'asc') {
-        //         order = -1;
-        //     }
-        //     if (typeof data[0][sortField] === 'number') {
-        //         return order*(a[sortField]-b[sortField]);
-        //     } else if (typeof data[0][sortField] === 'string') {
-        //         return order*(a[sortField].toLowerCase().localeCompare(b[sortField].toLowerCase()));
-        //     }
-        // });
+    sort(data, sortDirection, sortedBy) {
+        data.sort(sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1, (row, field) => {
+            if (field.endsWith('Id')) {
+                // I guess the smarter way to do this would be to check the column defs for a field matching the given name,
+                // And grab the type attributes label field name from that instead
+                return row[`${field.slice(0, field.length-2)}Name`];
+            }
+            if (field.endsWith('Url')) {
+                return row[`${field.slice(0, field.length-3)}Name`];
+            }
+            return row[field];
+        }));
         return data;
     }
 
@@ -173,7 +170,7 @@ function setupNormalColumn(fieldInfo) {
         type: convertType(fieldInfo.type.toLowerCase()),
         fieldName: (fieldInfo.relationshipName || '') + fieldInfo.name,
         editable: fieldInfo.isUpdateable,
-        sortable: !!fieldInfo.sortable
+        sortable: true//!!fieldInfo.sortable
     }
 }
 
@@ -195,4 +192,27 @@ function convertType(type) {
         default:
             return 'text';
     }
+}
+
+// Probably will need to incorporate column defs into this, for a couple reasons
+// - So we know the data type and can therefore sort it properly
+// - So we can convert between Id/Url columns and the corresponding displayed Name field easier
+export function sortBy(field, reverse, primer) {
+    const key = primer
+        ? function (x) {
+              return primer(x, field);
+          }
+        : function (x) {
+              return x[field];
+          };
+
+    return function (a, b) {
+        a = key(a);
+        b = key(b);
+        if (a === b) return 0;
+        if (a === null || a === undefined) return reverse * -1;
+        if (b === null || b === undefined) return reverse * 1;
+        if (typeof a === 'string' && typeof b === 'string') {return reverse * b.localeCompare(a)};
+        return reverse * ((a > b) - (b > a));
+    };
 }
