@@ -122,6 +122,21 @@ export function prepareTableData(records) {
     return result;
 }
 
+export function prepareDraftValues(records, columns) {
+    let recordsClone = JSON.parse(JSON.stringify(records));
+    columns.forEach(column => {
+        // Loop through columns, and for each column we're gonna modify record if it's a reference field
+        if (column.type === 'url') {
+            let urlFieldName = column.fieldName;
+            let displayDataFieldName = column.typeAttributes.label.fieldName;
+            records.forEach((record, index) => {
+                recordsClone[index][urlFieldName] = record[displayDataFieldName];
+            });
+        }
+    });
+    return recordsClone;
+}
+
 function flattenObject(obj, delimiter = '', prefix = '') {
     return Object.keys(obj).reduce((acc, k) => {
         const pre = prefix.length ? `${prefix}${delimiter}` : '';
@@ -155,43 +170,50 @@ function setupIdColumn(idFieldInfo, nameFieldInfo) {
         // We will probably need to add something like, `relationshipLabel` or something like that, 'cuz I don't think we
         // can generate a nice user-facing column label with what we currently have
         label: `${idFieldInfo.relationshipName ? (idFieldInfo.relationshipName + ' ') : ''}${nameFieldInfo.label}`,
-        fieldName: `${fieldNameBase}Url`,
+        fieldName: `${idFieldInfo.relationshipName || ''}Name`,
         typeAttributes: {
-            label: {fieldName: `${idFieldInfo.relationshipName || ''}Name` }
+            url: {fieldName: `${fieldNameBase}Url` }
         },
         iconName: idFieldInfo.iconName || 'standard:' + idFieldInfo.sObjectType.toLowerCase(),
         editable: nameFieldInfo.isUpdateable,
+        type: 'customName'
     }
 }
 
 function setupNormalColumn(fieldInfo) {
+    let fieldType = convertType(fieldInfo.type);
+    let typeAttributes = {};
+    if (fieldType === 'picklist') {
+        typeAttributes.options = [ { label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }, { label: undefined, value: undefined }];
+    }
     return {
-        // Don't use Id fields as labels - use them for urls instead
         label: (fieldInfo.relationshipName || '') + fieldInfo.label,
-        type: convertType(fieldInfo.type.toLowerCase()),
+        type: fieldType,
         fieldName: (fieldInfo.relationshipName || '') + fieldInfo.name,
-        editable: fieldInfo.isUpdateable,
-        sortable: true//!!fieldInfo.sortable
+        editable: (fieldType === 'location' || fieldType === 'date') ? false : fieldInfo.isUpdateable, // inline edit not supported for location or date fields
+        sortable: true,//!!fieldInfo.sortable
+        typeAttributes: {
+            options: [ { label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }, { label: '', value: '' }]
+        }
     }
 }
 
 function getNameFieldInfo(idFieldInfo, allFieldInfos) {
     let baseFieldName = idFieldInfo.name.slice(0, idFieldInfo.name.length - 2);
     let nameFieldInfo = allFieldInfos.find(fieldInfo => fieldInfo.name === baseFieldName + 'Name');
-    console.log(JSON.stringify(allFieldInfos.map(info => info.name)));
-    console.log(baseFieldName + 'Name');
     if (!nameFieldInfo) {
         return idFieldInfo;
     }
-    console.log(JSON.stringify(nameFieldInfo));
     return nameFieldInfo;
 }
 
 function convertType(type) {
-    switch (type) {
+    switch (type.toLowerCase()) {
         case 'boolean': case 'currency':
             return type;
-        case 'picklist': case 'string': case 'textarea': case 'phone': case 'address':
+        case 'picklist': 
+            return 'customPicklist';
+        case 'string': case 'textarea': case 'phone': case 'address':
             return 'text';
         case 'int': case 'double':
             return 'number';

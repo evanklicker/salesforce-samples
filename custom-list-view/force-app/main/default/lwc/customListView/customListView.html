@@ -43,11 +43,19 @@
                 </div>
                 <div class="slds-col" style="display: flex; flex: 1 1 content">
                     <div style="width: 1000px; height: 800px;"></div>
-                    <lightning-datatable style="flex-grow: 1; flex-shrink: 1" key-field="Id" data={displayedData}
+                    <!-- <lightning-datatable style="flex-grow: 1; flex-shrink: 1" key-field="Id" data={displayedData}
                         columns={displayedColumns} onrowselection={handleRowSelection}
                         selected-rows={displayedSelectedRows} show-row-number-column draft-values={draftValues}
-                        sorted-direction={sortDirection} sorted-by={sortedBy} onsort={handleSort}>
-                    </lightning-datatable>
+                        sorted-direction={sortDirection} sorted-by={sortedBy} onsort={handleSort}
+                        oncancel={handleCancel} onsave={handleSave} oncellchange={handleCellChange} errors={errors} onchange={handleChange}>
+                    </lightning-datatable> -->
+                    <c-enhanced-datatable
+                        style="flex-grow: 1; flex-shrink: 1" key-field="Id" data={displayedData}
+                        columns={displayedColumns} onrowselection={handleRowSelection}
+                        selected-rows={displayedSelectedRows} show-row-number-column="true" draft-values={draftValues}
+                        sorted-direction={sortDirection} sorted-by={sortedBy} onsort={handleSort}
+                        oncancel={handleCancel} onsave={handleSave} oncellchange={handleCellChange} errors={errors} onchange={handleChange}>
+                    </c-enhanced-datatable>
                 </div>
             </div>
             <div slot="footer">

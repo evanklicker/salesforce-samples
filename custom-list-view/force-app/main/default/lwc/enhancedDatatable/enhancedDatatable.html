@@ -1,0 +1,16 @@
+<template>
+    <template if:true={showRowNumberColumn}>
+        <lightning-datatable key-field="Id" data={displayedData} columns={displayedColumns} onrowselection={handleRowSelection}
+                            selected-rows={displayedSelectedRows} show-row-number-column draft-values={draftValues} sorted-direction={sortDirection}
+                            sorted-by={sortedBy} onsort={handleSort} oncancel={handleCancel} onsave={handleSave} oncellchange={handleCellChange}
+                            errors={errors} onchange={handleChange}>
+        </lightning-datatable>
+    </template>
+    <template if:false={showRowNumberColumn}>
+        <lightning-datatable key-field={keyField} data={data} columns={columns} onrowselection={onrowselection}
+        selected-rows={selectedRows} draft-values={draftValues} sorted-direction={sortedDirection}
+        sorted-by={sortedBy} onsort={onSort} oncancel={onCancel} onsave={onSave} oncellchange={onCellChange}
+        errors={errors} onchange={onChange}>
+</lightning-datatable>
+    </template>
+</template>

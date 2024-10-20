@@ -1,5 +1,5 @@
 import { wire, LightningElement, track } from 'lwc';
-import { TableData, getColumnSelectorParams, prepareTableData, createColumnDefs, sortBy } from './customListViewHelper';
+import { TableData, getColumnSelectorParams, prepareTableData, prepareDraftValues, createColumnDefs, sortBy } from './customListViewHelper';
 import DualListBoxModal from 'c/dualListBoxModal';
 import getTableData from '@salesforce/apex/CustomListViewController.getTableData';
 import getUserData from '@salesforce/apex/CustomListViewController.getUserData';
@@ -29,6 +29,8 @@ export default class DatatableWithInlineEdit extends LightningElement {
     filterPanelButtonSelected = false;
     @track filters = [];
     draftFilters = [];
+
+    errors;
 
     get pageLeftDisabled() {
         return this.currentPage <= 1;
@@ -79,6 +81,7 @@ export default class DatatableWithInlineEdit extends LightningElement {
                 this.displayedColumns = this.setupDisplayedColumns(this.columns, this.userData);
             }
             this.data = prepareTableData(data.records);
+            // this.draftValues = prepareDraftValues(this.data, this.displayedColumns);
             this.tableData = this.buildTableData({ data: this.data, pageSize: this.pageSize });
             this.pages = this.tableData.pages;
             this.error = null;
@@ -194,6 +197,22 @@ export default class DatatableWithInlineEdit extends LightningElement {
     addFilter() {
         this.filters.push({});
         console.log(this.filters);
+    }
+
+    handleSave(event) {
+        this.saveDraftValues = event.detail.draftValues;
+    }
+
+    handleCancel() {
+        this.tableData = this.buildTableData();
+    }
+
+    handleChange(event) {
+        console.log(JSON.stringify(event));
+    }
+
+    handleCellChange(event) {
+        console.log(JSON.stringify(event));
     }
 
     handleFirstPageButtonClicked() {
