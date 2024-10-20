@@ -1,0 +1,45 @@
+<template>
+    <div class="wrapper">
+        <a onclick={selectThis}>
+            <span class="filterContentWrapper">
+                <div class="fieldLabel">
+                    {fieldSelection.label}
+                    <span>*</span>
+                </div>
+                <span class="operatorAndValue">
+                    <span>{operatorSelection}</span>
+                    &nbsp;
+                    <span>{filterValue}</span>
+                </span>
+            </span>
+        </a>
+        <lightning-button-icon class="delete" variant="bare" icon-name="utility:close" onclick={deleteThis}></lightning-button-icon>
+        <!-- <section class="slds-popover slds-nubbin_right" role="dialog"> -->
+        <!-- <div class="popoverContainer">
+            <div class="slds-popover slds-nubbin_left">
+                <div class="slds-popover__body">
+                    <div>
+                        <lightning-combobox options={fieldOptions}></lightning-combobox>
+                    </div>
+                    <br>
+                    <div>
+                        <lightning-combobox options={operatorOptions}></lightning-combobox>
+                    </div>
+                    <br>
+                    <div>
+                        <lightning-input type={filterValueType}></lightning-input>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- </section> -->
+        <div class="slds-is-relative slds-col slds-size_5-of-12 slds-float_right ">
+            <section class="slds-popover slds-nubbin_left" role="dialog">
+                <div class="slds-popover__body">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+                        dolore magna aliqua.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+</template>

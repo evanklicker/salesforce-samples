@@ -212,7 +212,9 @@ export function sortBy(field, reverse, primer) {
         if (a === b) return 0;
         if (a === null || a === undefined) return reverse * -1;
         if (b === null || b === undefined) return reverse * 1;
-        if (typeof a === 'string' && typeof b === 'string') {return reverse * b.localeCompare(a)};
+        // The latter big with numeric: true should allow this to sort numbers that are strings properly
+        // Might still be a better way to handle it but leaving it as is for now
+        if (typeof a === 'string' && typeof b === 'string') {return reverse * b.localeCompare(a, undefined, { numeric: true })};
         return reverse * ((a > b) - (b > a));
     };
 }

@@ -1,62 +1,68 @@
 <template>
-    <div>
-        <lightning-card title={datatableTitle}>
-            <lightning-formatted-text class="slds-p-left_medium" value={selectedRowsText}></lightning-formatted-text>
-            <lightning-input class="slds-p-around_small" label="" placeholder="Search records..." type="search" onchange={handleSearchTermChanged}></lightning-input>
+    <div style="z-index: 2;">
+        <lightning-card class="" title={datatableTitle}>
+            <!-- <lightning-formatted-text class="slds-p-left_medium" value={selectedRowsText}></lightning-formatted-text>
+            <lightning-input class="slds-p-around_small" label="" placeholder="Search records..." type="search"
+                onchange={handleSearchTermChanged}></lightning-input>
             <div slot="actions">
-                <lightning-button-menu alternative-text="List view settings" variant="border-filled" icon-name="utility:settings" onselect={handleMenuSelect}>
+                <lightning-button-menu alternative-text="List view settings" variant="border-filled"
+                    icon-name="utility:settings" onselect={handleMenuSelect}>
                     <lightning-menu-item value="selectFields" label="Select Fields to Display"></lightning-menu-item>
                 </lightning-button-menu>
+                <lightning-button-icon-stateful alternative-text="Filters" icon-name="utility:filterList"
+                    variant="border-filled" selected={filterPanelButtonSelected}
+                    onclick={handleToggleFilterPanel}></lightning-button-icon-stateful>
             </div>
-            <div class="spinnerContainer" style="height: 300px">        
+            <div class="spinnerContainer">
                 <div if:true={isLoading}>
                     <lightning-spinner class="spinnerClass" alternative-text="Loading..."></lightning-spinner>
                 </div>
-                <lightning-datatable
-                        key-field="Id"
-                        data={displayedData}
-                        columns={displayedColumns}
-                        onrowselection={handleRowSelection}
-                        selected-rows={displayedSelectedRows}
-                        show-row-number-column
-                        draft-values={draftValues}
-                        sorted-direction={sortDirection}
-                        sorted-by={sortedBy}
-                        onsort={handleSort}>
-                </lightning-datatable>
+            </div> -->
+            <div style="background-color:#fafaf9;position:relative;height:600px;overflow:hidden;display:flex;flex-direction:row-reverse">
+                <div class="slds-panel slds-size_medium slds-panel_docked slds-panel_docked-right slds-is-open" data-id="filter-panel">
+                    <div class="slds-panel__header">
+                        <h2 class="slds-panel__header-title slds-text-heading_small slds-truncate" title="Panel Header">
+                            Panel Header
+                        </h2>
+                        <div class="slds-panel__header-actions">
+                            <lightning-button-icon icon-name="utility:close" alternative-text="Close Filters" onclick={closeFilterPanel}>
+                            </lightning-button-icon>
+                        </div>
+                    </div>
+                    <div class="slds-panel__body">
+                        <ol>
+                            <template for:each={filters} for:item="filter">
+                                <li key={filter.Id}>
+                                    <c-field-filter field-data={filterFieldData} field-selection={filter.fieldName}
+                                                    operator-selection={filter.operator} filter-value={filter.value}></c-field-filter>
+                                </li>
+                            </template>
+                        </ol>
+                        <lightning-button onclick={addFilter} label="Add filter"></lightning-button>
+                    </div>
+                </div>
+                <div class="slds-col" style="display: flex; flex: 1 1 content">
+                    <div style="width: 1000px; height: 800px;"></div>
+                    <!-- <lightning-datatable style="flex-grow: 1; flex-shrink: 1" key-field="Id" data={displayedData}
+                        columns={displayedColumns} onrowselection={handleRowSelection}
+                        selected-rows={displayedSelectedRows} show-row-number-column draft-values={draftValues}
+                        sorted-direction={sortDirection} sorted-by={sortedBy} onsort={handleSort}>
+                    </lightning-datatable> -->
+                </div>
             </div>
-            <div slot="footer"> 
+            <div slot="footer">
                 <div>
-                    <lightning-button-icon 
-                        icon-name="utility:jump_to_left" 
-                        onclick={handleFirstPageButtonClicked} 
-                        alternative-text="First page" 
-                        title="First page"
-                        disabled={pageLeftDisabled}>
+                    <lightning-button-icon icon-name="utility:jump_to_left" onclick={handleFirstPageButtonClicked} alternative-text="First page"
+                                           title="First page" disabled={pageLeftDisabled}>
                     </lightning-button-icon>
-                    <lightning-button-icon 
-                        icon-name="utility:chevronleft" 
-                        onclick={handlePreviousPageButtonClicked} 
-                        alternative-text="Page left" 
-                        title="Page left" 
-                        disabled={pageLeftDisabled}
-                        class="slds-m-left_xx-small">
+                    <lightning-button-icon icon-name="utility:chevronleft" onclick={handlePreviousPageButtonClicked} alternative-text="Page left"
+                                           title="Page left" disabled={pageLeftDisabled} class="slds-m-left_xx-small">
                     </lightning-button-icon>
-                    <lightning-button-icon 
-                        icon-name="utility:chevronright" 
-                        onclick={handleNextPageButtonClicked} 
-                        alternative-text="Page right" 
-                        title="Page right" 
-                        disabled={pageRightDisabled}
-                        class="slds-m-left_xx-small">
+                    <lightning-button-icon icon-name="utility:chevronright" onclick={handleNextPageButtonClicked} alternative-text="Page right"
+                                           title="Page right" disabled={pageRightDisabled} class="slds-m-left_xx-small">
                     </lightning-button-icon>
-                    <lightning-button-icon 
-                        icon-name="utility:jump_to_right" 
-                        onclick={handleLastPageButtonClicked} 
-                        alternative-text="Last page" 
-                        title="Last page" 
-                        disabled={pageRightDisabled}
-                        class="slds-m-left_xx-small">
+                    <lightning-button-icon icon-name="utility:jump_to_right" onclick={handleLastPageButtonClicked} alternative-text="Last page"
+                                           title="Last page" disabled={pageRightDisabled} class="slds-m-left_xx-small">
                     </lightning-button-icon>
                 </div>
                 <br>

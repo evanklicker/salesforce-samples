@@ -1,0 +1,59 @@
+a {
+    background-color: transparent;
+}
+
+.hasBeenEdited {
+    background-color: rgb(250, 255, 189);
+    border: 1px solid #A86403;
+}
+
+.wrapper {
+    border: 1px solid #747474;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    overflow: visible;
+}
+
+.filterContentWrapper {
+    display: inline-block;
+}
+
+.fieldLabel {
+    color:  rgb(68, 68, 68);
+    font-weight: 400;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.operatorAndValue {
+    color: rgb(24, 24, 24);
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    line-break: anywhere;
+}
+
+.delete {
+    float: right;
+    color: rgb(116, 116, 116);
+    background-color: transparent;
+}
+/* 
+.slds-popover.slds-nubbin_left{
+    position: relative;
+    z-index: 9002;
+}
+
+.popoverContainer {
+    position: absolute;
+    display: block;
+    overflow: visible;
+    z-index: 9001;
+    left: 15rem;
+    top: -5rem;
+} */
+.slds-popover.slds-nubbin_left{
+    position: absolute;
+    left:0rem;
+    top:-1.3rem;
+}

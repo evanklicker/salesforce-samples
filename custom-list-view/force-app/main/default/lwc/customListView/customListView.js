@@ -1,4 +1,4 @@
-import { wire, LightningElement } from 'lwc';
+import { wire, LightningElement, track } from 'lwc';
 import { TableData, getColumnSelectorParams, prepareTableData, createColumnDefs, sortBy } from './customListViewHelper';
 import DualListBoxModal from 'c/dualListBoxModal';
 import getTableData from '@salesforce/apex/CustomListViewController.getTableData';
@@ -26,11 +26,15 @@ export default class DatatableWithInlineEdit extends LightningElement {
     sortedBy;
     sortDirection = 'asc';
 
+    filterPanelButtonSelected = false;
+    @track filters = [];
+    draftFilters = [];
+
     get pageLeftDisabled() {
-        return this.currentPage === 1;
+        return this.currentPage <= 1;
     }
     get pageRightDisabled() {
-        return this.currentPage === this.tableData.pages;
+        return this.currentPage >= this.tableData.pages;
     }
     get pageText() {
         return `Page ${this.currentPage} of ${this.tableData.pages}`;
@@ -48,6 +52,15 @@ export default class DatatableWithInlineEdit extends LightningElement {
             return `1 item selected`;
         }
         return `${this.selectedRows.size} items selected`;
+    }
+    get filterFieldData() {
+        return this.columns.map(column => {
+            return {
+                name: column.name,
+                label: column.label,
+                type: column.type
+            }
+        })
     }
 
     @wire(getTableData)
@@ -168,6 +181,21 @@ export default class DatatableWithInlineEdit extends LightningElement {
         }
         // making a new set so that the front-end detects a change and updates things accordingly
         this.selectedRows = new Set(this.selectedRows.values());
+    }
+
+    handleToggleFilterPanel() {
+        this.filterPanelButtonSelected = !this.filterPanelButtonSelected;
+        this.template.querySelector('[data-id="filter-panel"]').classList.toggle('slds-is-open');
+    }
+
+    closeFilterPanel() {
+        this.filterPanelButtonSelected = false;
+        this.template.querySelector('[data-id="filter-panel"]').classList.remove('slds-is-open');
+    }
+
+    addFilter() {
+        this.filters.push({});
+        console.log(this.filters);
     }
 
     handleFirstPageButtonClicked() {

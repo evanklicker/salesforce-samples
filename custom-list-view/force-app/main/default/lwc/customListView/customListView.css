@@ -1,6 +1,6 @@
 .THIS .spinnerContainer {
 	position:relative;
-	height:280px;
+	height:300px;
 	border:1px solid #666;
 	overflow:auto;
 	background-color:#eee
@@ -8,4 +8,9 @@
  
 .THIS .spinnerClass {
 	position:absolute;
+}
+
+.THIS .panelContainer {
+	max-width: 321px;
+	float:right
 }
