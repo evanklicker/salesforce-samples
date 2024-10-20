@@ -1,7 +1,7 @@
 <template>
     <div style="z-index: 2;">
         <lightning-card class="" title={datatableTitle}>
-            <!-- <lightning-formatted-text class="slds-p-left_medium" value={selectedRowsText}></lightning-formatted-text>
+            <lightning-formatted-text class="slds-p-left_medium" value={selectedRowsText}></lightning-formatted-text>
             <lightning-input class="slds-p-around_small" label="" placeholder="Search records..." type="search"
                 onchange={handleSearchTermChanged}></lightning-input>
             <div slot="actions">
@@ -17,9 +17,9 @@
                 <div if:true={isLoading}>
                     <lightning-spinner class="spinnerClass" alternative-text="Loading..."></lightning-spinner>
                 </div>
-            </div> -->
+            </div>
             <div style="background-color:#fafaf9;position:relative;height:600px;overflow:hidden;display:flex;flex-direction:row-reverse">
-                <div class="slds-panel slds-size_medium slds-panel_docked slds-panel_docked-right slds-is-open" data-id="filter-panel">
+                <div class="slds-panel slds-size_medium slds-panel_docked slds-panel_docked-right" data-id="filter-panel">
                     <div class="slds-panel__header">
                         <h2 class="slds-panel__header-title slds-text-heading_small slds-truncate" title="Panel Header">
                             Panel Header
@@ -43,11 +43,11 @@
                 </div>
                 <div class="slds-col" style="display: flex; flex: 1 1 content">
                     <div style="width: 1000px; height: 800px;"></div>
-                    <!-- <lightning-datatable style="flex-grow: 1; flex-shrink: 1" key-field="Id" data={displayedData}
+                    <lightning-datatable style="flex-grow: 1; flex-shrink: 1" key-field="Id" data={displayedData}
                         columns={displayedColumns} onrowselection={handleRowSelection}
                         selected-rows={displayedSelectedRows} show-row-number-column draft-values={draftValues}
                         sorted-direction={sortDirection} sorted-by={sortedBy} onsort={handleSort}>
-                    </lightning-datatable> -->
+                    </lightning-datatable>
                 </div>
             </div>
             <div slot="footer">

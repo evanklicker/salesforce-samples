@@ -136,8 +136,6 @@ export default class DatatableWithInlineEdit extends LightningElement {
 
     handleSort(event) {
         ({ fieldName: this.sortedBy, sortDirection: this.sortDirection } = event.detail);
-        console.log(this.sortedBy);
-        console.log(this.sortDirection);
         this.tableData = this.buildTableData({sortDirection: this.sortDirection, sortedBy: this.sortedBy});
     }
 

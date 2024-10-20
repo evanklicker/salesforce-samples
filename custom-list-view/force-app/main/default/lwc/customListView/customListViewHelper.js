@@ -139,7 +139,7 @@ export function createColumnDefs(rawFieldInfos) {
         if (field.name.endsWith('Name')) { return; }
         let column;
         if (field.name.endsWith('Id')) {
-            column = setupIdColumn(field);
+            column = setupIdColumn(field, getNameFieldInfo(field, rawFieldInfos));
         } else {
             column = setupNormalColumn(field);
         }
@@ -147,19 +147,20 @@ export function createColumnDefs(rawFieldInfos) {
     }).filter(column => !!column);
 }
 
-function setupIdColumn(fieldInfo) {
-    let fieldNameBase = (fieldInfo.relationshipName || '') + fieldInfo.name.slice(0, fieldInfo.name.length - 2);
+function setupIdColumn(idFieldInfo, nameFieldInfo) {
+    let fieldNameBase = (idFieldInfo.relationshipName || '') + idFieldInfo.name.slice(0, idFieldInfo.name.length - 2);
     return {
         // I think we're eventually gonna need to override every field proivded by the base implementation..
-        ...setupNormalColumn(fieldInfo),
+        ...setupNormalColumn(idFieldInfo),
         // We will probably need to add something like, `relationshipLabel` or something like that, 'cuz I don't think we
         // can generate a nice user-facing column label with what we currently have
-        label: `${fieldInfo.relationshipName ? (fieldInfo.relationshipName + ' ') : ''}${fieldInfo.name.endsWith('Id') ? 'Name' : fieldInfo.label}`,
+        label: `${idFieldInfo.relationshipName ? (idFieldInfo.relationshipName + ' ') : ''}${nameFieldInfo.label}`,
         fieldName: `${fieldNameBase}Url`,
         typeAttributes: {
-            label: {fieldName: `${fieldInfo.relationshipName || ''}Name` }
+            label: {fieldName: `${idFieldInfo.relationshipName || ''}Name` }
         },
-        iconName: fieldInfo.iconName || 'standard:' + fieldInfo.sObjectType.toLowerCase()
+        iconName: idFieldInfo.iconName || 'standard:' + idFieldInfo.sObjectType.toLowerCase(),
+        editable: nameFieldInfo.isUpdateable,
     }
 }
 
@@ -172,6 +173,18 @@ function setupNormalColumn(fieldInfo) {
         editable: fieldInfo.isUpdateable,
         sortable: true//!!fieldInfo.sortable
     }
+}
+
+function getNameFieldInfo(idFieldInfo, allFieldInfos) {
+    let baseFieldName = idFieldInfo.name.slice(0, idFieldInfo.name.length - 2);
+    let nameFieldInfo = allFieldInfos.find(fieldInfo => fieldInfo.name === baseFieldName + 'Name');
+    console.log(JSON.stringify(allFieldInfos.map(info => info.name)));
+    console.log(baseFieldName + 'Name');
+    if (!nameFieldInfo) {
+        return idFieldInfo;
+    }
+    console.log(JSON.stringify(nameFieldInfo));
+    return nameFieldInfo;
 }
 
 function convertType(type) {
