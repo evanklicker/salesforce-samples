@@ -58,11 +58,11 @@ export default class DatatableWithInlineEdit extends LightningElement {
     get filterFieldData() {
         return this.columns.map(column => {
             return {
-                name: column.name,
+                name: column.fieldName,
                 label: column.label,
                 type: column.type
             }
-        })
+        }).sort((a, b) => a.label.localeCompare(b.label));
     }
 
     @wire(getTableData)
@@ -195,8 +195,16 @@ export default class DatatableWithInlineEdit extends LightningElement {
     }
 
     addFilter() {
-        this.filters.push({});
+        this.filters.push({fieldName: "", operator: "", value: ""});
         console.log(this.filters);
+    }
+
+    deleteFilter(event) {
+        let filterIndex = event.detail;
+        console.log(`deleted filter index: ${filterIndex}`);
+        console.log(JSON.stringify(this.filters));
+        this.filters.splice(filterIndex, 1);
+        console.log(JSON.stringify(this.filters));
     }
 
     handleSave(event) {

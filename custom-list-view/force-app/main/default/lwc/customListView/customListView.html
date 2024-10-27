@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div style="background-color:#fafaf9;position:relative;height:600px;overflow:hidden;display:flex;flex-direction:row-reverse">
-                <div class="slds-panel slds-size_medium slds-panel_docked slds-panel_docked-right" data-id="filter-panel">
+                <div style="overflow:visible" class="slds-panel slds-size_medium slds-panel_docked slds-panel_docked-right" data-id="filter-panel">
                     <div class="slds-panel__header">
                         <h2 class="slds-panel__header-title slds-text-heading_small slds-truncate" title="Panel Header">
                             Panel Header
@@ -31,18 +31,18 @@
                     </div>
                     <div class="slds-panel__body">
                         <ol>
-                            <template for:each={filters} for:item="filter">
-                                <li key={filter.Id}>
-                                    <c-field-filter field-data={filterFieldData} field-selection={filter.fieldName}
-                                                    operator-selection={filter.operator} filter-value={filter.value}></c-field-filter>
+                            <template for:each={filters} for:item="filter" for:index="index">
+                                <li class="slds-m-bottom_small" key={filter.Id}>
+                                    <c-field-filter field-data={filterFieldData} field-selection={filter.fieldName} filter-index={index}
+                                                    operator-selection={filter.operator} filter-value={filter.value} ondeletefilter={deleteFilter}></c-field-filter>
                                 </li>
                             </template>
                         </ol>
                         <lightning-button onclick={addFilter} label="Add filter"></lightning-button>
                     </div>
                 </div>
-                <div class="slds-col" style="display: flex; flex: 1 1 content">
-                    <div style="width: 1000px; height: 800px;"></div>
+                <div class="slds-col" style="display: flex; flex: 1 1 content; overflow:hidden">
+                    <!-- <div style="width: 1000px; height: 800px;"></div> -->
                     <!-- <lightning-datatable style="flex-grow: 1; flex-shrink: 1" key-field="Id" data={displayedData}
                         columns={displayedColumns} onrowselection={handleRowSelection}
                         selected-rows={displayedSelectedRows} show-row-number-column draft-values={draftValues}
@@ -50,7 +50,7 @@
                         oncancel={handleCancel} onsave={handleSave} oncellchange={handleCellChange} errors={errors} onchange={handleChange}>
                     </lightning-datatable> -->
                     <c-enhanced-datatable
-                        style="flex-grow: 1; flex-shrink: 1" key-field="Id" data={displayedData}
+                        style="width: 100%" key-field="Id" data={displayedData}
                         columns={displayedColumns} onrowselection={handleRowSelection}
                         selected-rows={displayedSelectedRows} show-row-number-column="true" draft-values={draftValues}
                         sorted-direction={sortDirection} sorted-by={sortedBy} onsort={handleSort}

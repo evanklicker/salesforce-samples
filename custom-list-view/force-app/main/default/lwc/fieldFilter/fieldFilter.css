@@ -38,22 +38,21 @@ a {
     color: rgb(116, 116, 116);
     background-color: transparent;
 }
-/* 
-.slds-popover.slds-nubbin_left{
+
+/* .slds-popover.slds-nubbin_left{
     position: relative;
     z-index: 9002;
-}
+} */
 
 .popoverContainer {
     position: absolute;
     display: block;
     overflow: visible;
     z-index: 9001;
-    left: 15rem;
-    top: -5rem;
-} */
-.slds-popover.slds-nubbin_left{
+    right: 0.75rem;
+    top: -9rem;
+}
+.slds-popover.slds-nubbin_right{
     position: absolute;
-    left:0rem;
-    top:-1.3rem;
+    right:0rem;
 }

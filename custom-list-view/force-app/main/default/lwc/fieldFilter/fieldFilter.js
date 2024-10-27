@@ -3,6 +3,7 @@ import { LightningElement, api } from 'lwc';
 export default class FieldFilter extends LightningElement {
 
     @api filterIndex; // for easy deletion
+    initialIndex = 0;
     /*
         fieldData: [
             { name: "accountName", label: "Account Name", type: "text"},
@@ -10,14 +11,14 @@ export default class FieldFilter extends LightningElement {
         ]
     */
     @api fieldData;
-    @api fieldSelection;
+    @api fieldSelection = { value:"" };
     // @api draftFieldSeletion;
-    @api operatorSelection;
+    @api operatorSelection = { value:"" };
     // @api draftOperationSelection;
     @api filterValue;
     // @api draftFilterValue;
 
-    showEditPopover = false;
+    showEditPopover = true;
     operatorOptions = [];
 
     outsideClick;
@@ -33,27 +34,46 @@ export default class FieldFilter extends LightningElement {
         return this.fieldData.map(option => {
             return {
                 label: option.label,
-                value: option.value
+                value: option.name
             }
         })
     }
 
     set fieldSelection(newValue) {
-        let currentFieldData = this.fieldData.find(data => data.name === this.fieldSelection?.name);
+        let currentFieldData = this.fieldData.find(data => data.name === this.fieldSelection?.value);
         this.operatorOptions = this.getOperatorOptions(this.convertType(currentFieldData.type));
     }
 
     connectedCallback() {
-        document.addEventListener('click', this.outsideClick = this.closeTooltip.bind(this));
+        // document.addEventListener('click', this.outsideClick = this.closeTooltip.bind(this));
         if (!this.fieldSelection) {
             this.fieldSelection = { label: 'Account Name', value: 'accountName', type: 'text'};
-            this.operatorSelection = this.operatorOptions.EQUALS;
+            this.operatorOptions = this.getOperatorOptions(this.convertType('text'));
+            this.operatorSelection = { label: 'equals', value: this.operators.EQUALS };
             this.filterValue = 'test';
         }
+        this.initialIndex = this.filterIndex;
+    }
+
+    handleFieldChanged(event) {
+        this.fieldSelection = this.fieldOptions.find(option => option.value === event.detail.value);
+        console.log('field changed: ' + JSON.stringify(this.fieldSelection));
+    }
+    handleOperatorChanged(event) {
+        this.operatorSelection = this.operatorOptions.find(option => option.value === event.detail.value)
+        console.log('operator changed: ' + JSON.stringify(this.operatorSelection));
+    }
+    handleValueChanged(event) {
+        this.filterValue = event.detail.value;
+        console.log('filter value changed: ' + JSON.stringify(this.filterValue));
+    }
+    handleDoneClicked() {
+        console.log('Clicked done!');
+        this.showEditPopover = false;
     }
 
     deleteThis() {
-        this.dispatchEvent(new CustomEvent("deleteFilter", { detail: this.filterIndex }));
+        this.dispatchEvent(new CustomEvent("deletefilter", { detail: this.filterIndex }));
     }
 
     selectThis() {

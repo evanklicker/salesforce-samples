@@ -1,3 +1,7 @@
-<template>
-    <lightning-combobox value={editedValue} options={typeAttributes.options} required={required} data-inputable="true"></lightning-combobox>
+<template>    
+    <div style="height: 200px; width: 300px;">
+        {typeAttributes.options}
+        <lightning-combobox value={editedValue} options={typeAttributes.options} required={required} data-inputable="true"></lightning-combobox>
+        test
+    </div>
 </template>

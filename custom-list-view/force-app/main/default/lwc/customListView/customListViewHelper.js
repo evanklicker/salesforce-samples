@@ -183,7 +183,7 @@ function setupIdColumn(idFieldInfo, nameFieldInfo) {
 function setupNormalColumn(fieldInfo) {
     let fieldType = convertType(fieldInfo.type);
     let typeAttributes = {};
-    if (fieldType === 'picklist') {
+    if (fieldType === 'customPicklist') {
         typeAttributes.options = [ { label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }, { label: undefined, value: undefined }];
     }
     return {
