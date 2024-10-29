@@ -1,56 +1,45 @@
 <template>
-    <div class="wrapper">
-        <a onclick={selectThis}>
-            <span class="filterContentWrapper">
-                <div class="fieldLabel">
-                    {fieldSelection.label}
+    <div class="wrapper" data-id={dataId}>
+        <a class="filterContentWrapper" onclick={selectThis}>
+            <div class="fieldLabel">
+                {displayedFieldSelection}
+                <template if:true={hasPendingChanges}>
                     <span>*</span>
-                    &nbsp;
-                    {initialIndex}
-                </div>
-                <span class="operatorAndValue">
-                    <span>{operatorSelection.label}</span>
-                    &nbsp;
-                    <span>{filterValue}</span>
-                </span>
+                </template>
+            </div>
+            <span class="operatorAndValue">
+                <span>{displayedOperatorSelection}</span>
+                &nbsp;
+                <span>{displayedFilterValue}</span>
             </span>
         </a>
         <lightning-button-icon class="delete" variant="bare" icon-name="utility:close" onclick={deleteThis}></lightning-button-icon>
     </div>
-    <!-- <section class="slds-popover slds-nubbin_right" role="dialog"> -->
     <template if:true={showEditPopover}>
         <span class="slds-is-relative">
             <div class="popoverContainer">
                 <div class="slds-popover slds-nubbin_right">
                     <div class="slds-popover__body">
                         <div>
-                            <lightning-combobox label="Field" value={fieldSelection.value} options={fieldOptions}
-                                                onchange={handleFieldChanged}></lightning-combobox>
+                            <lightning-combobox label="Field" value={popoverFieldSelection.value} options={fieldOptions}
+                                                onchange={handlePopoverFieldChanged}></lightning-combobox>
                         </div>
                         <br>
                         <div>
-                            <lightning-combobox label="Operator" value={operatorSelection.value} options={operatorOptions}
-                                                onchange={handleOperatorChanged}></lightning-combobox>
+                            <lightning-combobox label="Operator" value={popoverOperatorSelection.value} options={operatorOptions}
+                                                onchange={handlePopoverOperatorChanged}></lightning-combobox>
                         </div>
                         <br>
                         <div>
-                            <lightning-input label="Value" value={filterValue} type={filterValueType} onchange={handleValueChanged}></lightning-input>
+                            <lightning-input label="Value" value={popoverFilterValue} type={filterValueType} onchange={handlePopoverValueChanged}></lightning-input>
                         </div>
                         <div>
-                            <lightning-button style="float: right" class="slds-p-vertical_small" label="Done" onclick={handleDoneClicked}></lightning-button>
+                            <lightning-button style="float: right" class="slds-p-vertical_small" label="Done"
+                                              onclick={popoverDoneClicked}></lightning-button>
                         </div>
                     </div>
                 </div>
             </div>
         </span>
     </template>
-    <!-- </section> -->
-    <!-- <div class="slds-is-relative slds-col slds-size_5-of-12 slds-float_right ">
-            <section class="slds-popover slds-nubbin_left" role="dialog">
-                <div class="slds-popover__body">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                        dolore magna aliqua.</p>
-                </div>
-            </section>
-        </div> -->
 </template>

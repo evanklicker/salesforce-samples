@@ -12,17 +12,24 @@ export default class FieldFilter extends LightningElement {
     */
     @api fieldData;
     @api fieldSelection = { value:"" };
-    // @api draftFieldSeletion;
+    @api draftFieldSelection;
     @api operatorSelection = { value:"" };
-    // @api draftOperationSelection;
+    @api draftOperatorSelection;
     @api filterValue;
-    // @api draftFilterValue;
+    @api draftFilterValue;
+
+    popoverFieldSelection;
+    popoverOperatorSelection;
+    popoverFilterValue
 
     showEditPopover = true;
     operatorOptions = [];
 
     outsideClick;
 
+    get dataId() {
+        return `custom-filter-${this.filterIndex}`;
+    }
     get currentFieldData() {
         let currentFieldData = this.fieldData.find(data => data.name === this.fieldSelection?.name);
         if (!currentFieldData) {
@@ -43,33 +50,48 @@ export default class FieldFilter extends LightningElement {
         let currentFieldData = this.fieldData.find(data => data.name === this.fieldSelection?.value);
         this.operatorOptions = this.getOperatorOptions(this.convertType(currentFieldData.type));
     }
+    get displayedFieldSelection() {
+        return this.draftFieldSelection?.label || this.fieldSelection?.label || '';
+    }
+    get displayedOperatorSelection() {
+        return this.draftOperatorSelection?.label || this.operatorSelection?.label || '';
+    }
+    get displayedFilterValue() {
+        console.log('Getting displayed filter value!\nDraft: ' + JSON.stringify(this.draftFilterValue) + ';\nSaved: ' + JSON.stringify(this.filterValue));
+        return this.draftFilterValue || this.filterValue || '';
+    }
+    get hasPendingChanges() {
+        console.log(`Testing pending changes:\nFieldSelection: ${this.draftFieldSelection && this.fieldSelection?.value !== this.draftFieldSelection.value}\nOperatorSelection: ${this.draftOperatorSelection && this.operatorSelection?.value !== this.draftOperatorSelection.value}\nFilterValue: ${this.draftFilterValue && this.filterValue !== this.draftFilterValue}`);
+        return (this.draftFieldSelection && this.fieldSelection?.value !== this.draftFieldSelection.value) ||
+            (this.draftOperatorSelection && this.operatorSelection?.value !== this.draftOperatorSelection.value) ||
+            (this.draftFilterValue && this.filterValue !== this.draftFilterValue);
+    }
 
     connectedCallback() {
         // document.addEventListener('click', this.outsideClick = this.closeTooltip.bind(this));
         if (!this.fieldSelection) {
-            this.fieldSelection = { label: 'Account Name', value: 'accountName', type: 'text'};
+            this.fieldSelection = { label: 'Account Name', value: 'Name', type: 'text'};
             this.operatorOptions = this.getOperatorOptions(this.convertType('text'));
-            this.operatorSelection = { label: 'equals', value: this.operators.EQUALS };
+            this.operatorSelection = { label: 'equals', value: this.operators.EQUALS, apply: void(0) };
             this.filterValue = 'test';
         }
         this.initialIndex = this.filterIndex;
+        this.popoverFieldSelection = this.fieldSelection;
+        this.popoverOperatorSelection = this.operatorSelection;
+        this.popoverFilterValue = this.filterValue;
     }
 
-    handleFieldChanged(event) {
-        this.fieldSelection = this.fieldOptions.find(option => option.value === event.detail.value);
-        console.log('field changed: ' + JSON.stringify(this.fieldSelection));
+    handlePopoverFieldChanged(event) {
+        this.popoverFieldSelection = this.fieldOptions.find(option => option.value === event.detail.value);
+        console.log('field changed: ' + JSON.stringify(this.popoverFieldSelection));
     }
-    handleOperatorChanged(event) {
-        this.operatorSelection = this.operatorOptions.find(option => option.value === event.detail.value)
-        console.log('operator changed: ' + JSON.stringify(this.operatorSelection));
+    handlePopoverOperatorChanged(event) {
+        this.popoverOperatorSelection = this.operatorOptions.find(option => option.value === event.detail.value);
+        console.log('operator changed: ' + JSON.stringify(this.popoverOperatorSelection));
     }
-    handleValueChanged(event) {
-        this.filterValue = event.detail.value;
-        console.log('filter value changed: ' + JSON.stringify(this.filterValue));
-    }
-    handleDoneClicked() {
-        console.log('Clicked done!');
-        this.showEditPopover = false;
+    handlePopoverValueChanged(event) {
+        this.popoverFilterValue = event.detail.value;
+        console.log('filter value changed: ' + JSON.stringify(this.popoverFilterValue));
     }
 
     deleteThis() {
@@ -81,8 +103,39 @@ export default class FieldFilter extends LightningElement {
         console.log('Filter selected!');
     }
 
-    closeTooltip() {
+    save() {
+        this.dispatchEvent(new CustomEvent("saveFilter", { detail: {
+            field: this.draftFieldSelection || this.fieldSelection,
+            operator: this.draftOperatorSelection || this.operatorSelection,
+            value: this.draftFilterValue || this.filterValue
+        }}))
+    }
+    cancel() {
+        this.draftFieldSelection = undefined;
+        this.draftOperatorSelection = undefined;
+        this.draftFilterValue = undefined;
+        this.popoverFieldSelection = undefined;
+        this.popoverOperatorSelection = undefined;
+        this.popoverFilterValue = undefined;
         this.showEditPopover = false;
+    }
+
+    popoverDoneClicked() {
+        console.log('PopoverDoneClicked');
+        this.showEditPopover = false;
+        this.draftFieldSelection = this.popoverFieldSelection;
+        this.draftOperatorSelection = this.popoverOperatorSelection;
+        this.draftFilterValue = this.popoverFilterValue;
+        if (this.hasPendingChanges) {
+            console.log('Found pending changes!');
+            let filterElement = this.template.querySelector(`[data-id="${this.dataId}"]`);
+            // if (!filterElement.classList.contains('hasBeenEdited')) {
+                this.template.querySelector(`[data-id="${this.dataId}"]`).classList.add('hasBeenEdited');
+            // }
+        } else {
+            console.log('Did not find pending changes!');
+            this.template.querySelector(`[data-id="${this.dataId}"]`).classList.remove('hasBeenEdited');
+        }
     }
 
     // Needs a special case for picklist, it seems
@@ -117,29 +170,29 @@ export default class FieldFilter extends LightningElement {
         switch (type.toLowerCase()) {
             case 'text': case 'email': case 'tel': case 'url':
                 return [
-                    { label: 'equals',           value: this.operators.EQUALS },
-                    { label: 'not equal to',     value: this.operators.NOT_EQUAL_TO },
-                    { label: 'less than',        value: this.operators.LESS_THAN },
-                    { label: 'greater than',     value: this.operators.GREATER_THAN },
-                    { label: 'less or equal',    value: this.operators.LESS_OR_EQUAL },
-                    { label: 'greater or equal', value: this.operators.GREATER_OR_EQUAL },
-                    { label: 'contains',         value: this.operators.CONTAINS },
-                    { label: 'does not contain', value: this.operators.DOES_NOT_CONTAIN },
-                    { label: 'starts with',      value: this.operators.STARTS_WITH },
+                    { label: 'equals',           value: this.operators.EQUALS,           apply: this.equals },
+                    { label: 'not equal to',     value: this.operators.NOT_EQUAL_TO,     apply: this.notEqualTo },
+                    { label: 'less than',        value: this.operators.LESS_THAN,        apply: this.lessThan },
+                    { label: 'greater than',     value: this.operators.GREATER_THAN,     apply: this.greaterThan },
+                    { label: 'less or equal',    value: this.operators.LESS_OR_EQUAL,    apply: this.lessOrEqual },
+                    { label: 'greater or equal', value: this.operators.GREATER_OR_EQUAL, apply: this.greaterOrEqual },
+                    { label: 'contains',         value: this.operators.CONTAINS,         apply: this.contains },
+                    { label: 'does not contain', value: this.operators.DOES_NOT_CONTAIN, apply: this.doesNotContain },
+                    { label: 'starts with',      value: this.operators.STARTS_WITH,      apply: this.startsWith },
                 ];
             case 'date': case 'datetime': case 'time': case 'number':
                 return [
-                    { label: 'equals',           value: this.operators.EQUALS },
-                    { label: 'not equal to',     value: this.operators.NOT_EQUAL_TO },
-                    { label: 'less than',        value: this.operators.LESS_THAN },
-                    { label: 'greater than',     value: this.operators.GREATER_THAN },
-                    { label: 'less or equal',    value: this.operators.LESS_OR_EQUAL },
-                    { label: 'greater or equal', value: this.operators.GREATER_OR_EQUAL }
+                    { label: 'equals',           value: this.operators.EQUALS,           apply: this.equals },
+                    { label: 'not equal to',     value: this.operators.NOT_EQUAL_TO,     apply: this.notEqualTo },
+                    { label: 'less than',        value: this.operators.LESS_THAN,        apply: this.lessThan },
+                    { label: 'greater than',     value: this.operators.GREATER_THAN,     apply: this.greaterThan },
+                    { label: 'less or equal',    value: this.operators.LESS_OR_EQUAL,    apply: this.lessOrEqual },
+                    { label: 'greater or equal', value: this.operators.GREATER_OR_EQUAL, apply: this.greaterOrEqual },
                 ];
             case 'checkbox': case 'checkbox-button': case 'toggle': 
                 return [
-                    { label: 'equals',           value: this.operators.EQUALS },
-                    { label: 'not equal to',     value: this.operators.NOT_EQUAL_TO }
+                    { label: 'equals',           value: this.operators.EQUALS,           apply: this.equals },
+                    { label: 'not equal to',     value: this.operators.NOT_EQUAL_TO,     apply: this.notEqualTo }
                 ];
             
             // I honestly just don't want to deal with these right now
@@ -160,4 +213,74 @@ export default class FieldFilter extends LightningElement {
                 return [];
         }
     }
+
+    equals(data, filterValue) {
+        return data == filterValue;
+    }
+    notEqualTo(data, filterValue) {
+        return data != filterValue;
+    }
+    lessThan(data, filterValue) {
+        let dataType = typeof data;
+        let filterType = typeof filterValue;
+        if (dataType !== filterType) {
+            return false;
+        }
+        if (dataType === 'string') {
+            return dataType.localeCompare(filterValue) < 0;
+        }
+        return false;
+    }
+    greaterThan(data, filterValue) {
+        let dataType = typeof data;
+        let filterType = typeof filterValue;
+        if (dataType !== filterType) {
+            return false;
+        }
+        if (dataType === 'string') {
+            return dataType.localeCompare(filterValue) > 0;
+        }
+        return false;
+    }
+    lessOrEqual(data, filterValue) {
+        let dataType = typeof data;
+        let filterType = typeof filterValue;
+        if (dataType !== filterType) {
+            return false;
+        }
+        if (dataType === 'string') {
+            return dataType.localeCompare(filterValue) <= 0;
+        }
+        return false;
+    }
+    greaterOrEqual(data, filterValue) {
+        let dataType = typeof data;
+        let filterType = typeof filterValue;
+        if (dataType !== filterType) {
+            return false;
+        }
+        if (dataType === 'string') {
+            return dataType.localeCompare(filterValue) >= 0;
+        }
+        return false;
+    }
+    contains(data, filterValue) {
+        if (!data) {
+            return !filterValue;
+          }
+          let d = typeof data === 'string' ? data : JSON.stringify(data);
+          let f = typeof filterValue === 'string' ? filterValue : JSON.stringify(filterValue);
+          return d.toLowerCase().includes(f.toLowerCase());
+    }
+    doesNotContain(data, filterValue) {
+        return !this.contains(data, filterValue);
+    }
+    startsWith(data, filterValue) {
+        if (!data) {
+            return !filterValue;
+          }
+          let d = typeof data === 'string' ? data : JSON.stringify(data);
+          let f = typeof filterValue === 'string' ? filterValue : JSON.stringify(filterValue);
+          return d.toLowerCase().startsWith(f.toLowerCase()); 
+    }    
 }
