@@ -46,7 +46,7 @@ a {
     overflow: visible;
     z-index: 9001;
     right: 0.75rem;
-    top: -9rem;
+    top: -10.5rem;
 }
 .slds-popover.slds-nubbin_right{
     position: absolute;

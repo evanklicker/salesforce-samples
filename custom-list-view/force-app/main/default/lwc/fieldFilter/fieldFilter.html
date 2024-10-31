@@ -2,13 +2,13 @@
     <div class="wrapper" data-id={dataId}>
         <a class="filterContentWrapper" onclick={selectThis}>
             <div class="fieldLabel">
-                {displayedFieldSelection}
+                {displayedFieldSelection.label}
                 <template if:true={hasPendingChanges}>
                     <span>*</span>
                 </template>
             </div>
             <span class="operatorAndValue">
-                <span>{displayedOperatorSelection}</span>
+                <span>{displayedOperatorSelection.label}</span>
                 &nbsp;
                 <span>{displayedFilterValue}</span>
             </span>

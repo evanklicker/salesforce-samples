@@ -21,19 +21,25 @@
             <div style="background-color:#fafaf9;position:relative;height:600px;overflow:hidden;display:flex;flex-direction:row-reverse">
                 <div style="overflow:visible" class="slds-panel slds-size_medium slds-panel_docked slds-panel_docked-right" data-id="filter-panel">
                     <div class="slds-panel__header">
-                        <h2 class="slds-panel__header-title slds-text-heading_small slds-truncate" title="Panel Header">
+                        <!-- <h2 class="slds-panel__header-title slds-text-heading_small slds-truncate" title="Panel Header">
                             Panel Header
                         </h2>
                         <div class="slds-panel__header-actions">
                             <lightning-button-icon icon-name="utility:close" alternative-text="Close Filters" onclick={closeFilterPanel}>
                             </lightning-button-icon>
+                        </div> -->
+                        <div>
+                            <lightning-button label="Cancel" onclick={cancelEditFilters}></lightning-button>
+                        </div>
+                        <div class="slds-grid slds-col slds-grid_align-end">
+                            <lightning-button variant="Brand" label="Save" onclick={saveFilters}></lightning-button>
                         </div>
                     </div>
                     <div class="slds-panel__body">
                         <ol>
                             <template for:each={filters} for:item="filter" for:index="index">
                                 <li class="slds-m-bottom_small" key={filter.Id}>
-                                    <c-field-filter field-data={filterFieldData} field-selection={filter.fieldName} filter-index={index}
+                                    <c-field-filter field-data={filterFieldData} field-selection={filter.field} filter-index={filter.index}
                                                     operator-selection={filter.operator} filter-value={filter.value} ondeletefilter={deleteFilter}></c-field-filter>
                                 </li>
                             </template>

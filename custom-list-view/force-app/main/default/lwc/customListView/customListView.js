@@ -28,7 +28,6 @@ export default class DatatableWithInlineEdit extends LightningElement {
 
     filterPanelButtonSelected = false;
     @track filters = [];
-    draftFilters = [];
 
     errors;
 
@@ -115,11 +114,11 @@ export default class DatatableWithInlineEdit extends LightningElement {
 
     buildTableData({ data, pageSize, filters, searchCriterion: searchTerm, sortDirection, sortedBy }) {
         return new TableData(
-            data || this.data, 
-            pageSize || this.tableData.pageSize, 
-            filters, 
-            searchTerm || this.searchTerm, 
-            sortDirection || this.sortDirection, 
+            data || this.data,
+            pageSize || this.tableData.pageSize,
+            filters,
+            searchTerm || this.searchTerm,
+            sortDirection || this.sortDirection,
             sortedBy || this.sortedBy);
     }
 
@@ -139,7 +138,7 @@ export default class DatatableWithInlineEdit extends LightningElement {
 
     handleSort(event) {
         ({ fieldName: this.sortedBy, sortDirection: this.sortDirection } = event.detail);
-        this.tableData = this.buildTableData({sortDirection: this.sortDirection, sortedBy: this.sortedBy});
+        this.tableData = this.buildTableData({ sortDirection: this.sortDirection, sortedBy: this.sortedBy });
     }
 
     // When the user types into the box, wait for a bit before running the search to give them an opportunity to finish typing before removing their control
@@ -195,7 +194,12 @@ export default class DatatableWithInlineEdit extends LightningElement {
     }
 
     addFilter() {
-        this.filters.push({fieldName: "", operator: "", value: ""});
+        this.filters.push({ 
+            field: { label: 'Account Name', value: 'Name', type: 'text' }, 
+            operator: { label: 'equals', value: 'equals' }, 
+            value: 'testasdf', 
+            index: this.filters.length 
+        });
         console.log(this.filters);
     }
 
@@ -207,10 +211,30 @@ export default class DatatableWithInlineEdit extends LightningElement {
         console.log(JSON.stringify(this.filters));
     }
 
+    cancelEditFilters() {
+        console.log("Cancel edit filters button clicked!");
+    }
+
+    saveFilters() {
+        let filterElements = this.template.querySelectorAll('c-field-filter');
+        if (!filterElements) { console.warn('Found no filters!'); return; }
+        this.filters = [];
+        this.filters = Array.from(filterElements).map(filter => filter.getParams());
+        // Array.from(filterElements).forEach(filter => {
+        //     this.filters.push(filter.getParams());
+        // });
+
+        console.group('In parent - saveFilters');
+        console.log(JSON.stringify(this.filters));
+        console.groupEnd();
+    }
+
+    // datatable save - rename this
     handleSave(event) {
         this.saveDraftValues = event.detail.draftValues;
     }
 
+    // datatable cancel - rename this
     handleCancel() {
         this.tableData = this.buildTableData();
     }
